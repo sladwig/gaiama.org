@@ -197,7 +197,11 @@ module.exports = {
     },
     {
       resolve: `gatsby-plugin-netlify`,
-      options: {},
+      options: {
+        headers: {
+          '/*': [`X-Robots-Tag: noindex, follow`],
+        },
+      },
     },
     `gatsby-plugin-glamor`,
   ],
