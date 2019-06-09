@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'react-emotion'
 import slugify from 'slugify'
@@ -31,7 +31,7 @@ const ContentWrapper = styled.div(props => ({
   maxHeight: props.spoiler && (props.spoilerOpen ? `100%` : `100px`),
 }))
 
-const TitledCopy = ({
+const TitledCopy: FunctionComponent<TitledCopyProps> = ({
   title,
   rank,
   paragraphs,
@@ -92,18 +92,20 @@ const TitledCopy = ({
   )
 }
 
-TitledCopy.propTypes = {
-  title: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-  paragraphs: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
-  rank: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  centered: PropTypes.bool,
-  centeredTitle: PropTypes.bool,
-  centeredCopy: PropTypes.bool,
-  full: PropTypes.bool,
-  spoiler: PropTypes.bool,
-  spoilerLabel: PropTypes.string,
-  state: PropTypes.object,
-  setState: PropTypes.func,
+interface TitledCopyProps {
+  title?: string[] | string
+  paragraphs?: string[] | string
+  rank?: number | string
+  centered?: boolean
+  centeredTitle?: boolean
+  centeredCopy?: boolean
+  full?: boolean
+  spoiler?: boolean
+  spoilerLabel?: string
+  state?: {
+    spoilerOpen: boolean
+  }
+  setState?: () => any
 }
 
 export default StateProvider(TitledCopy, { spoilerOpen: false }, {})

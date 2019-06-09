@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'react-emotion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -92,33 +92,40 @@ const Checkbox = styled.input`
  * https://gist.github.com/MoOx/12726d85a3343d84ee3c
  * https://stackoverflow.com/questions/49187412/handle-react-ondoubleclick-and-single-onclick-for-same-element
  */
-class ShareWidget extends Component {
-  state = {
-    linkModalOpen: false,
-    showFullUrl: false,
-  }
+function ShareWidget({  label,
+  getFullUrlLabel,
+  copyLabel,
+  linkLabelShort,
+  linkLabelFull,
+  shareUrlSuccessLabel,
+  shareUrlErrorLabel,
+  post,
+  siteUrl,
+}: ShareWidgetProps)  {
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [showFullUrl, setShowFullUrl] = useState(false);
 
-  linkInputRef = React.createRef()
+  const linkInputRef = useRef<HTMLInputElement>()
 
-  getLink = () =>
-    this.props.siteUrl +
+  const getLink = () =>
+    siteUrl +
     (this.state.showFullUrl
-      ? this.props.post.fields.url
-      : this.props.post.fields.slug_short)
+      ? post.fields.url
+      : post.fields.slug_short)
 
-  onLinkModalButtonClick = ({ metaKey }) =>
+  const onLinkModalButtonClick = ({ metaKey }) =>
     metaKey ? this.copyToClipboard() : this.toggleLinkModal()
 
-  toggleLinkModal = () =>
-    this.setState({ linkModalOpen: !this.state.linkModalOpen })
+  const toggleLinkModal = () => setLinkModalOpen(!linkModalOpen)
 
-  toggleLink = () => this.setState({ showFullUrl: !this.state.showFullUrl })
+  const toggleLink = () => setShowFullUrl(!showFullUrl)
 
-  onClickLinkInput = () => this.linkInputRef.current.select()
+  const onClickLinkInput = () => linkInputRef.current.select()
 
-  copyToClipboard = () => {
+  const copyToClipboard = () => {
     /* globals document */
-    let shareUrlInput = document.getElementById(`share-url`)
+    // let shareUrlInput = document.getElementById(`share-url`)
+    let shareUrlInput = linkInputRef.current
     let inputShouldBeRemoved = false
     try {
       if (!shareUrlInput) {
@@ -131,33 +138,21 @@ class ShareWidget extends Component {
       shareUrlInput.select()
 
       if (document.execCommand(`copy`)) {
-        toast.success(this.props.shareUrlSuccessLabel)
+        toast.success(shareUrlSuccessLabel)
       } else {
         throw new Error()
       }
     } catch (err) {
-      toast.error(this.props.shareUrlErrorLabel)
+      toast.error(shareUrlErrorLabel)
     }
     if (inputShouldBeRemoved) {
       shareUrlInput.remove()
     }
   }
 
-  render() {
-    const { linkModalOpen, showFullUrl } = this.state
-    const {
-      label,
-      getFullUrlLabel,
-      copyLabel,
-      linkLabelShort,
-      linkLabelFull,
-      post,
-      siteUrl,
-      ...props
-    } = this.props
-    const { title, tweet_id, lang } = post.frontmatter
-    const link = siteUrl + post.fields.url
-    const shortLink = siteUrl + post.fields.slug_short
+  const { title, tweet_id, lang } = post.frontmatter
+  const link = siteUrl + post.fields.url
+  const shortLink = siteUrl + post.fields.slug_short
 
     return (
       <Container id="sharewidget" {...props}>
@@ -282,7 +277,7 @@ class ShareWidget extends Component {
                 value={showFullUrl ? link : shortLink}
                 readOnly
                 onClick={this.onClickLinkInput}
-                innerRef={this.linkInputRef}
+                innerRef={linkInputRef}
               />
               <Button onClick={this.copyToClipboard}>{copyLabel}</Button>
             </LinkWrapper>
@@ -293,16 +288,26 @@ class ShareWidget extends Component {
   }
 }
 
-ShareWidget.propTypes = {
-  label: PropTypes.string,
-  getFullUrlLabel: PropTypes.string,
-  copyLabel: PropTypes.string,
-  linkLabelShort: PropTypes.string,
-  linkLabelFull: PropTypes.string,
-  shareUrlSuccessLabel: PropTypes.string,
-  shareUrlErrorLabel: PropTypes.string,
-  post: PropTypes.object,
-  siteUrl: PropTypes.string,
+interface ShareWidgetProps  {
+  label: string,
+  getFullUrlLabel: string,
+  copyLabel: string,
+  linkLabelShort: string,
+  linkLabelFull: string,
+  shareUrlSuccessLabel: string,
+  shareUrlErrorLabel: string,
+  post: {
+      frontmatter: {
+           title: string,
+           tweet_id: string,
+           lang: string
+      },
+      fields: {
+          url: string,
+          slug_short: string
+      }
+  },
+  siteUrl: string,
 }
 
 export default ShareWidget

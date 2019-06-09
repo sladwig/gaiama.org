@@ -1,10 +1,6 @@
 import { Component } from 'react'
 
-const StateProvider = (
-  WrappedComponent,
-  initialState,
-  lifeCycleHooks
-) =>
+const StateProvider = (WrappedComponent, initialState, lifeCycleHooks) =>
   class StateProvider extends Component {
     static get name() {
       return WrappedComponent.name
