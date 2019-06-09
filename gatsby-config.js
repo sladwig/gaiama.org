@@ -24,6 +24,7 @@ module.exports = {
   },
   plugins: [
     // `gatsby-plugin-fastclick`,
+    `gatsby-plugin-typescript`,
     {
       resolve: `gatsby-plugin-layout`,
       options: {

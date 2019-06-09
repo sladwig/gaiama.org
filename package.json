@@ -106,6 +106,9 @@
     "validator": "10.8.0"
   },
   "devDependencies": {
+    "@types/node": "^12.0.7",
+    "@types/react": "^16.8.19",
+    "@types/react-dom": "^16.8.4",
     "all-contributors-cli": "^5.4.0",
     "babel-plugin-preval": "^3.0.1",
     "cheerio": "1.0.0-rc.2",
@@ -123,6 +126,7 @@
     "gatsby-plugin-netlify": "2.0.0",
     "gatsby-plugin-netlify-cache": "0.1.0",
     "gatsby-plugin-sharp": "2.0.5",
+    "gatsby-plugin-typescript": "^2.0.15",
     "gatsby-plugin-typography": "2.2.0",
     "gatsby-remark-copy-linked-files": "2.0.5",
     "gatsby-remark-custom-blocks": "2.0.0",
