@@ -1,17 +1,17 @@
 import React, { Component, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
+import { css } from '@emotion/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { colors, media } from '@/theme'
+import { colors, media } from '@src/theme'
 import { faLink, faTimes, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import {
   faFacebookSquare,
   faTwitterSquare,
   faGooglePlusSquare,
-  faTelegramPlane,
 } from '@fortawesome/free-brands-svg-icons'
-import { PureButton } from '@/components/layout/Button'
-import { toast } from '@/utils/toast'
+import { PureButton } from '@components/layout/Button'
+import { toast } from '@src/utils/toast'
 
 const Container = styled.div({
   [media.greaterThan(`xsmall`)]: {
@@ -52,7 +52,9 @@ const LinkLabel = styled.span`
   white-space: nowrap;
   color: ${colors.gray};
 `
-
+const StyledA = styled.a`
+  border: none;
+`
 const InvisibleInput = styled.input`
   margin-left: 0.7rem;
   background-color: ${colors.transparent};
@@ -160,26 +162,33 @@ function ShareWidget({  label,
 
         <ContainerInner>
           <div
-            css={{
-              '& svg': { color: colors.brands.facebook, marginRight: `1rem` },
-            }}
+            css={css`
+              & svg {
+                color: ${colors.brands.facebook};
+                margin-right: 1rem;
+              }
+            `}
           >
-            <a
+            <StyledA
               href={`http://www.facebook.com/sharer.php?u=${encodeURIComponent(
                 link
               )}`}
               target="_blank"
               rel="noopener noreferrer"
+              title="Share via Facebook"
             >
               <FontAwesomeIcon icon={faFacebookSquare} size="lg" />
-            </a>
+            </StyledA>
           </div>
           <div
-            css={{
-              '& svg': { color: colors.brands.twitter, margin: `0 1rem` },
-            }}
+            css={css`
+              & svg {
+                color: ${colors.brands.twitter};
+                margin: 0 1rem;
+              }
+            `}
           >
-            <a
+            <StyledA
               href={
                 tweet_id
                   ? `https://twitter.com/intent/retweet?tweet_id=${encodeURIComponent(
@@ -191,59 +200,58 @@ function ShareWidget({  label,
               }
               target="_blank"
               rel="noopener noreferrer"
+              title="Share via Twitter"
             >
               <FontAwesomeIcon icon={faTwitterSquare} size="lg" />
-            </a>
+            </StyledA>
           </div>
           <div
-            css={{ '& svg': { color: colors.brands.gplus, margin: `0 1rem` } }}
+            css={css`
+              & svg {
+                color: ${colors.brands.gplus};
+                margin: 0 1rem;
+              }
+            `}
           >
-            <a
+            <StyledA
               href={`https://plus.google.com/share?url=${encodeURIComponent(
                 link
               )}&hl=${encodeURIComponent(lang)}`}
               target="_blank"
               rel="noopener noreferrer"
+              title="Share via Google+"
             >
               <FontAwesomeIcon icon={faGooglePlusSquare} size="lg" />
-            </a>
+            </StyledA>
           </div>
           <div
-            css={{
-              '& svg': { color: colors.brands.telegram, margin: `1rem` },
-            }}
+            css={css`
+              & svg {
+                color: ${colors.primaryLite};
+                margin: 1rem;
+              }
+            `}
           >
-            <a
-              href={`https://telegram.me/share/url?url=${encodeURIComponent(
-                link
-              )}&text=${encodeURIComponent(title)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FontAwesomeIcon icon={faTelegramPlane} size="lg" />
-            </a>
-          </div>
-          <div
-            css={{
-              '& svg': { color: colors.brands.telegram, margin: `1rem` },
-            }}
-          >
-            <a
+            <StyledA
               href={`mailto:?body=${encodeURIComponent(
                 link
               )}&subject=${encodeURIComponent(title)}`}
               rel="noopener noreferrer"
+              title="Share via Mail"
             >
               <FontAwesomeIcon icon={faEnvelope} size="lg" />
-            </a>
+            </StyledA>
           </div>
 
           <div
-            css={{
-              '& svg': { color: colors.link },
-            }}
+            css={css`
+              & svg {
+                color: ${colors.link};
+              }
+            `}
           >
             <Button
+              aria-label="Copy Link"
               onClick={this.onLinkModalButtonClick}
               onDoubleClick={this.copyToClipboard}
             >
@@ -262,7 +270,7 @@ function ShareWidget({  label,
               <FontAwesomeIcon
                 icon={faTimes}
                 onClick={this.toggleLinkModal}
-                css={`
+                css={css`
                   color: ${colors.gray3};
                 `}
               />

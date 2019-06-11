@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
-import Img from 'gatsby-image'
+import { css } from '@emotion/core'
+import Img from 'gatsby-image/withIEPolyfill'
 import Helmet from 'react-helmet'
-import MainLayout from '@/components/MainLayout'
-import TitledCopy from '@/components/TitledCopy'
-import Newsticker from '@/components/Newsticker'
+import MainLayout from '@components/MainLayout'
+import TitledCopy from '@components/TitledCopy'
+import Newsticker from '@components/Newsticker'
 
 const PaypalSuccessPage = props => {
   const { page, NewsTicker } = props.data
@@ -19,15 +20,17 @@ const PaypalSuccessPage = props => {
         centered
         title={page.frontmatter.intro.title}
         paragraphs={page.frontmatter.intro.text}
-        css={{ marginBottom: `2rem` }}
+        css={css`
+          margin-bottom: 2rem;
+        `}
       />
 
       <div
-        css={{
-          display: `flex`,
-          justifyContent: `center`,
-          marginBottom: `2rem`,
-        }}
+        css={css`
+          display: flex;
+          justify-content: center;
+          margin-bottom: 2rem;
+        `}
       >
         <Img fixed={page.frontmatter.assets.gratitude.image.fixed} />
       </div>
@@ -65,18 +68,9 @@ export const query = graphql`
     ...newstickerLandscape
 
     page: javascriptFrontmatter(frontmatter: { slug: { eq: $slug } }) {
+      ...PageTranslations
       fields {
         url
-        translations {
-          fields {
-            url
-          }
-          frontmatter {
-            title
-            lang
-            slug
-          }
-        }
       }
       frontmatter {
         title

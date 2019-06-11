@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import Button from '@/components/layout/Button'
+import { css } from '@emotion/core'
+import Button from '@components/layout/Button'
 
 class Randomizer extends Component {
   constructor(props) {
@@ -37,20 +38,21 @@ class Randomizer extends Component {
       <div {...props}>
         <blockquote>
           <p
-            css={{
-              '&:before, &:after': {
-                fontSize: `1.4rem`,
-                letterSpacing: `-0.2rem`,
-              },
-              '&:before': {
-                content: `">>"`,
-                marginRight: `.2rem`,
-              },
-              '&:after': {
-                content: `"<<"`,
-                marginLeft: `.2rem`,
-              },
-            }}
+            css={css`
+              &:before,
+              &:after {
+                font-size: 1.4rem;
+                letter-spacing: -0.2rem;
+              }
+              &:before {
+                content: '>>';
+                margin-right: 0.2rem;
+              }
+              &:after {
+                content: '<<';
+                margin-left: 0.2rem;
+              }
+            `}
             dangerouslySetInnerHTML={{
               __html: this.getCurrent().quote,
             }}

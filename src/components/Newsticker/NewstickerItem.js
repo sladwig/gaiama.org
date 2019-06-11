@@ -1,44 +1,63 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'gatsby'
-import Img from 'gatsby-image'
-import { colors, fontFamilies } from '@/theme'
+import styled from '@emotion/styled'
+import { css } from '@emotion/core'
+import Img from 'gatsby-image/withIEPolyfill'
+import { colors, fontFamilies } from '@src/theme'
+
+const StyledLink = styled(Link)`
+  border: none;
+  :hover {
+    background-color: transparent;
+    color: ${colors.link};
+  }
+`
+
+const Wrapper = styled.div`
+  padding: 0.5rem;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s,
+    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s,
+    padding 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s;
+  :hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 10px 0px ${colors.gray52};
+  }
+`
 
 const NewstickerItem = ({ item, readmoreLabel, layout, ...props }) => {
   const coverImage =
     item.frontmatter.cover && item.frontmatter.cover.image.fluid
 
   return (
-    <div {...props}>
+    <Wrapper {...props}>
       <div
-        css={{
-          display: `flex`,
-          flexDirection: layout === `row` && `column`,
-        }}
+        css={css`
+          display: flex;
+          flex-direction: ${layout === `row` && `column`};
+        `}
       >
-        {coverImage && (
-          <Link to={item.fields.url} css={styles.imageWrapper(layout)}>
-            <Img fluid={coverImage} css={styles.image} />
-          </Link>
-        )}
+        <StyledLink to={item.fields.url}>
+          {coverImage && (
+            <div css={styles.imageWrapper(layout)}>
+              <Img fluid={coverImage} css={styles.image} />
+            </div>
+          )}
 
-        <div>
-          <h2 css={styles.title(layout)}>
-            <Link to={item.fields.url}>{item.frontmatter.title}</Link>
-          </h2>
+          <div>
+            <h2 css={styles.title(layout)}>{item.frontmatter.title}</h2>
 
-          <p css={styles.excerpt}>
-            {item.excerpt || item.frontmatter.summary}
+            <p css={styles.excerpt}>
+              {item.excerpt || item.frontmatter.summary}
 
-            {readmoreLabel && (
-              <Link to={item.fields.url} css={styles.readmoreLink}>
-                {readmoreLabel}
-              </Link>
-            )}
-          </p>
-        </div>
+              {readmoreLabel && (
+                <span css={styles.readmoreLink}>{readmoreLabel}</span>
+              )}
+            </p>
+          </div>
+        </StyledLink>
       </div>
-    </div>
+    </Wrapper>
   )
 }
 NewstickerItem.propTypes = {

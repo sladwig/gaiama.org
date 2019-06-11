@@ -6,25 +6,38 @@ export const Fragments = graphql`
       siteMetadata {
         title
         siteUrl
+        version
       }
     }
   }
 
   fragment SiteMeta on Query {
-    SiteMeta: siteMetaMarkdown(frontmatter: { lang: { eq: $lang } }) {
-      htmlAst
+    SiteMeta: mdx(
+      frontmatter: { type: { eq: "SiteMeta" }, lang: { eq: $lang } }
+    ) {
+      code {
+        body
+      }
       frontmatter {
         assets {
           logo {
             image: childImageSharp {
-              fluid(maxWidth: 420, quality: 75) {
+              fluid(
+                maxWidth: 420
+                quality: 75
+                srcSetBreakpoints: [140, 240, 340, 840]
+              ) {
                 ...GatsbyImageSharpFluid_withWebp
               }
             }
           }
           headerBg {
             image: childImageSharp {
-              fluid(maxWidth: 1440, quality: 75) {
+              fluid(
+                maxWidth: 1440
+                quality: 75
+                srcSetBreakpoints: [320, 450, 640, 900, 1280]
+              ) {
                 ...GatsbyImageSharpFluid_withWebp
               }
             }
@@ -40,10 +53,20 @@ export const Fragments = graphql`
           toContent
           toNav
         }
+        videoPlayerCookieButton
         footer {
           menuTitle
           socialTitle
           supportTitle
+        }
+        sponsors {
+          id
+          href
+          title
+          src {
+            publicURL
+          }
+          alt
         }
       }
     }
@@ -124,7 +147,7 @@ export const Fragments = graphql`
   }
 
   fragment legal on Query {
-    legal: allJavascriptFrontmatter(
+    legal: allMdx(
       filter: { frontmatter: { lang: { eq: $lang }, menu: { eq: "legal" } } }
     ) {
       edges {
@@ -136,6 +159,26 @@ export const Fragments = graphql`
             lang
             title
           }
+        }
+      }
+    }
+  }
+
+  fragment PageTranslations on JavascriptFrontmatter {
+    fields {
+      translations {
+        id
+        lc
+        title
+        titleShort
+        to
+        fields {
+          url
+        }
+        frontmatter {
+          title
+          lang
+          slug
         }
       }
     }

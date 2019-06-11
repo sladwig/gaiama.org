@@ -1,13 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
-import MainLayout from '@/components/MainLayout'
+import MDXRenderer from 'gatsby-mdx/mdx-renderer'
+// import { withMDXScope } from 'gatsby-mdx/context'
+// import { TableOfContents } from '@gaiama/react-mdx-table-of-contents'
+import MainLayout from '@components/MainLayout'
 
 const SimplePage = props => {
-  const { page } = props.data
+  const { page /*,scope*/ } = props.data
+  // const TOC = () =>
+  //   TableOfContents({ items: props.data.page.tableOfContents.items })
   return (
     <MainLayout {...props}>
-      <p dangerouslySetInnerHTML={{ __html: page.frontmatter.content }} />
+      <MDXRenderer /*scope={{ TableOfContents: TOC, ...scope }}*/>
+        {page.code.body}
+      </MDXRenderer>
     </MainLayout>
   )
 }
@@ -17,9 +24,10 @@ SimplePage.propTypes = {
 }
 
 export default SimplePage
+// export default withMDXScope(SimplePage)
 
 export const query = graphql`
-  query($lang: String!, $slug: String!) {
+  query($lang: String!, $url: String!) {
     ...siteData
     ...SiteMeta
     ...languages
@@ -28,7 +36,11 @@ export const query = graphql`
     ...legal
     ...Accounts
 
-    page: javascriptFrontmatter(frontmatter: { slug: { eq: $slug } }) {
+    page: mdx(fields: { url: { eq: $url } }) {
+      code {
+        body
+      }
+      #tableOfContents
       fields {
         url
         translations {
@@ -46,7 +58,6 @@ export const query = graphql`
         title
         lang
         slug
-        content
         summary
       }
     }

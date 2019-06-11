@@ -1,7 +1,7 @@
 // import React from 'react'
 // import PropTypes from 'prop-types'
 // // import Helmet from 'react-helmet'
-// import Img from 'gatsby-image'
+// import Img from 'gatsby-image/withIEPolyfill'
 // import { graphql, Link } from 'gatsby'
 // import chunk from 'lodash/fp/chunk'
 // import compose from 'ramda/src/compose'
@@ -11,10 +11,10 @@
 // import path from 'ramda/src/path'
 // import merge from 'ramda/src/merge'
 // import Media from 'react-media'
-// import MainLayout from '@/components/MainLayout'
-// import { mediaQuery } from '@/components/MediaQuery'
-// // import { Pager, Paginator } from '@/components/Paginator'
-// import { colors, gradients, media } from '@/theme'
+// import MainLayout from '@components/MainLayout'
+// import { mediaQuery } from '@components/MediaQuery'
+// // import { Pager, Paginator } from '@components/Paginator'
+// import { colors, gradients, media } from '@src/theme'
 
 // const Image = ({ filename, description, slug, title, linkLabel }) => (
 //   <div key={filename.base} css={{ flex: filename.aspectRatio }}>
@@ -236,6 +236,7 @@
 //     ...Paginator
 
 //     page: javascriptFrontmatter(frontmatter: { slug: { eq: $slug } }) {
+// ...PageTranslations
 //       fields {
 // url
 //         translations {

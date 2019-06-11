@@ -1,12 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'gatsby'
-import Img from 'gatsby-image'
-import { colors } from '@/theme'
+import Img from 'gatsby-image/withIEPolyfill'
+import styled from '@emotion/styled'
+import { colors } from '@src/theme'
 
-const ArticlePreview = ({ article, isVisible, ...props }) => (
+const StyledLink = styled(Link)`
+  border: none;
+  :hover {
+    background-color: transparent;
+    color: ${colors.gray80};
+  }
+`
+
+const ArticlePreview = ({ article, isVisible, readMoreLabel, ...props }) => (
   <article css={articleStyles.article(isVisible)} {...props}>
-    <Link to={article.fields.url}>
+    <StyledLink to={article.fields.url}>
       {article.frontmatter.cover && (
         <Img fluid={article.frontmatter.cover.childImageSharp.fluid} />
       )}
@@ -14,7 +23,7 @@ const ArticlePreview = ({ article, isVisible, ...props }) => (
       {/* {article.frontmatter.subtitle && (
         <h4 css={articleStyles.title}>{article.frontmatter.subtitle}</h4>
       )} */}
-    </Link>
+    </StyledLink>
 
     <p css={articleStyles.body}>
       {article.frontmatter.summary || article.excerpt}
@@ -23,7 +32,7 @@ const ArticlePreview = ({ article, isVisible, ...props }) => (
     <footer css={articleStyles.footer}>
       <div css={articleStyles.footerInner}>
         <time css={articleStyles.time}>{article.fields.dateStrLocalized}</time>
-        <Link to={article.fields.url}>{`read more`}</Link>
+        <StyledLink to={article.fields.url}>{readMoreLabel}</StyledLink>
       </div>
     </footer>
   </article>
@@ -32,6 +41,7 @@ const ArticlePreview = ({ article, isVisible, ...props }) => (
 ArticlePreview.propTypes = {
   article: PropTypes.object.isRequired,
   isVisible: PropTypes.bool,
+  readMoreLabel: PropTypes.string,
 }
 
 export default ArticlePreview
@@ -43,11 +53,18 @@ const articleStyles = {
     // width: `327`,
     // width: `29%`,
     // marginBottom: `4rem`,
-    boxShadow: `0 0 8px 0px ${colors.gray52}`,
+    boxShadow: `0 0 4px 0px ${colors.gray52}`,
     background: colors.lightBlue,
     display: `flex`,
     flexDirection: `column`,
     overflow: `hidden`,
+    transition: `transform 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s, padding 250ms cubic-bezier(0.4, 0, 0.2, 1) 0s`,
+    ':hover': {
+      // transform: `scale(1.03)`,
+      transform: `translateY(-4px)`,
+      boxShadow: `0 0 10px 0px ${colors.gray52}`,
+      // boxShadow: `rgba(25, 17, 34, 0.1) 0px 10px 42px`,
+    },
   }),
   title: {
     margin: `.5rem 1rem 0`,

@@ -1,19 +1,19 @@
 /* global window */
 export default {
-  getItem: id => {
-    if (typeof window === `undefined`) return {}
+  getItem: (id, fallback = {}) => {
+    if (typeof window === `undefined`) return fallback
     try {
-      return JSON.parse(window.localStorage.getItem(id))
+      return JSON.parse(window.localStorage.getItem(id)) || fallback
     } catch (err) {
-      return {}
+      return fallback
     }
   },
-  setItem: (id, val) => {
-    if (typeof window === `undefined`) return {}
+  setItem: (id, val, fallback = {}) => {
+    if (typeof window === `undefined`) return fallback
     return window.localStorage.setItem(id, JSON.stringify(val))
   },
-  removeItem: id => {
-    if (typeof window === `undefined`) return {}
+  removeItem: (id, fallback = {}) => {
+    if (typeof window === `undefined`) return fallback
     return window.localStorage.removeItem(id)
   },
 }

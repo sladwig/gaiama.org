@@ -2,14 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
 import Head from 'react-helmet'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
+import { css } from '@emotion/core'
 import * as QS from '@gaiama/query-string'
-import MainLayout from '@/components/MainLayout'
-import Link from '@/components/Link'
-import TitledCopy from '@/components/TitledCopy'
-import Randomizer from '@/components/Randomizer'
-import RenderArticles from '@/components/RenderArticles'
-import { colors, media } from '@/theme'
+import MainLayout from '@components/MainLayout'
+import Link from '@components/Link'
+import TitledCopy from '@components/TitledCopy'
+import Randomizer from '@components/Randomizer'
+import RenderArticles from '@components/RenderArticles'
+import { colors, media } from '@src/theme'
 
 const StyledRandomizer = styled(Randomizer)`
   text-align: center;
@@ -38,7 +39,7 @@ const StyledRandomizer = styled(Randomizer)`
     background: transparent;
     border: transparent;
     color: ${colors.gray80};
-    padding: 0
+    padding: 0;
     &:hover {
       transform: scale(1.05);
     }
@@ -55,12 +56,11 @@ const BlogPage = props => {
   ) || { value: filter }
 
   const filterWithFallback = items => {
-    const results = items.filter(
-      a =>
-        tags.length
-          ? a.node.frontmatter.tags.length &&
-            a.node.frontmatter.tags.some(t => tags.includes(t))
-          : true
+    const results = items.filter(a =>
+      tags.length
+        ? a.node.frontmatter.tags.length &&
+          a.node.frontmatter.tags.some(t => tags.includes(t))
+        : true
     )
     return results.length ? results : items
   }
@@ -86,8 +86,8 @@ const BlogPage = props => {
       />
       {!filter && (
         <StyledRandomizer
-          quotes={props.data.quotes.frontmatter.quotes}
-          nextQuoteLabel={props.data.quotes.frontmatter.nextQuoteLabel}
+          quotes={props.data.quotes.quotes}
+          nextQuoteLabel={props.data.quotes.nextQuoteLabel}
         />
       )}
 
@@ -101,64 +101,68 @@ const BlogPage = props => {
         }
         // : props.data.page.frontmatter.title}
         paragraphs={props.data.page.frontmatter.intro.paragraphs}
-        css={{
-          marginBottom: `1.5rem`,
-          '& div': {
-            fontSize: `0.85rem`,
-            [media.greaterThan(`medium`)]: {
-              fontSize: `1rem`,
-            },
-          },
-        }}
+        css={css`
+          margin-bottom: 1.5rem;
+          & div {
+            font-size: 0.85rem;
+            ${media.greaterThan(`medium`)} {
+              font-size: 1rem;
+            }
+          }
+        `}
       />
 
       <div
-        css={{
-          display: `flex`,
-          justifyContent: `center`,
-          textAlign: `center`,
-          position: `relative`,
-          margin: `2rem auto 3rem`,
-          [media.greaterThan(`small`)]: {
-            width: `60%`,
-          },
-          '&:before': {
-            content: `""`,
-            height: `1px`,
-            width: `100%`,
-            position: `absolute`,
-            display: `block`,
-            top: `50%`,
-            left: `0`,
-            right: `0`,
-            background: `linear-gradient(to right, ${colors.gray4}, ${
-              colors.gray9
-            }, ${colors.gray4}) no-repeat`,
-          },
-        }}
+        css={css`
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          position: relative;
+          margin: 2rem auto 3rem;
+          ${media.greaterThan(`small`)} {
+            width: 60%;
+          }
+          &:before {
+            content: '';
+            height: 1px;
+            width: 100%;
+            position: absolute;
+            display: block;
+            top: 50%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(
+                to right,
+                ${colors.gray4},
+                ${colors.gray9},
+                ${colors.gray4}
+              )
+              no-repeat;
+          }
+        `}
       >
         <div
-          css={{
-            display: `flex`,
-            justifyContent: `space-between`,
-            background: colors.white,
-            fontSize: `.9rem`,
-            position: `relative`,
-            // transform: `translateY(.8rem)`,
-            '& > a': {
-              margin: `0 .5rem`,
-              padding: `.2rem .5rem`,
-            },
-          }}
+          css={css`
+            display: flex;
+            justify-content: space-between;
+            background: ${colors.white};
+            font-size: 0.9rem;
+            position: relative;
+            & > a {
+              margin: 0 0.5rem;
+              padding: 0.2rem 0.5rem;
+            }
+          `}
         >
           <Link
             to={props.location.pathname}
             sort="desc"
             persistQuery
-            css={{
-              pointerEvents: !isSortAsc && `none`,
-              color: !isSortAsc && colors.grayTurqoise,
-            }}
+            css={css`
+              pointer-events: ${!isSortAsc && `none`};
+              border: none;
+              color: ${!isSortAsc && colors.grayTurqoise};
+            `}
           >
             {props.data.page.frontmatter.sortLabels.desc}
           </Link>
@@ -173,10 +177,11 @@ const BlogPage = props => {
             to={props.location.pathname}
             sort="asc"
             persistQuery
-            css={{
-              pointerEvents: isSortAsc && `none`,
-              color: isSortAsc && colors.grayTurqoise,
-            }}
+            css={css`
+              pointer-events: ${isSortAsc && `none`};
+              border: none;
+              color: ${isSortAsc && colors.grayTurqoise};
+            `}
           >
             {props.data.page.frontmatter.sortLabels.asc}
           </Link>
@@ -185,25 +190,26 @@ const BlogPage = props => {
 
       <RenderArticles
         articles={articles}
-        css={{
-          display: `flex`,
-          flexWrap: `wrap`,
-          justifyContent: `center`,
-          [media.greaterThan(`small`)]: {
-            justifyContent: `space-between`,
-          },
-          '& > article': {
-            flex: `0 0 97%`,
-            maxWidth: `370px`,
-            marginBottom: `4rem`,
-            [media.greaterThan(`small`)]: {
-              flexBasis: `47%`,
-            },
-            [media.greaterThan(`large`)]: {
-              flexBasis: `29%`,
-            },
-          },
-        }}
+        readMoreLabel={props.data.page.frontmatter.readMoreLabel}
+        css={css`
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          ${media.greaterThan(`small`)} {
+            justify-content: space-between;
+          }
+          & > article {
+            flex: 0 0 97%;
+            max-width: 370px;
+            margin-bottom: 4rem;
+            ${media.greaterThan(`small`)} {
+              flex-basis: 47%;
+            }
+            ${media.greaterThan(`large`)} {
+              flex-basis: 29%;
+            }
+          }
+        `}
       />
     </MainLayout>
   )
@@ -217,7 +223,7 @@ BlogPage.propTypes = {
 export default BlogPage
 
 export const query = graphql`
-  query($lang: String!, $slug: String!) {
+  query($lang: String!, $url: String!) {
     ...siteData
     ...SiteMeta
     ...languages
@@ -226,19 +232,10 @@ export const query = graphql`
     ...legal
     ...Accounts
 
-    page: javascriptFrontmatter(frontmatter: { slug: { eq: $slug } }) {
+    page: javascriptFrontmatter(fields: { url: { eq: $url } }) {
+      ...PageTranslations
       fields {
         url
-        translations {
-          fields {
-            url
-          }
-          frontmatter {
-            title
-            lang
-            slug
-          }
-        }
       }
       frontmatter {
         title
@@ -248,6 +245,7 @@ export const query = graphql`
         intro {
           paragraphs
         }
+        readMoreLabel
         sortLabels {
           all
           asc
@@ -265,7 +263,7 @@ export const query = graphql`
       }
     }
 
-    articles: allMarkdownRemark(
+    articles: allMdx(
       filter: {
         fields: { type: { eq: "post" } }
         frontmatter: { lang: { eq: $lang }, published: { eq: true } }
@@ -316,7 +314,9 @@ export const query = graphql`
       }
     }
 
-    labels: siteMetaMarkdown(frontmatter: { lang: { eq: $lang } }) {
+    labels: mdx(
+      frontmatter: { type: { eq: "SiteMeta" }, lang: { eq: $lang } }
+    ) {
       frontmatter {
         labeled
         labels {
@@ -326,13 +326,11 @@ export const query = graphql`
       }
     }
 
-    quotes: quotesMarkdown(frontmatter: { lang: { eq: $lang } }) {
-      frontmatter {
-        nextQuoteLabel
-        quotes {
-          author
-          quote
-        }
+    quotes: quotesYaml(lang: { eq: $lang }) {
+      nextQuoteLabel
+      quotes {
+        author
+        quote
       }
     }
   }

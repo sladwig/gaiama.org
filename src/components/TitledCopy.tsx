@@ -1,10 +1,10 @@
 import React, { FunctionComponent } from 'react'
 import PropTypes from 'prop-types'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 import slugify from 'slugify'
-import { media } from '@/theme'
-import StateProvider from '@/components/StateProvider'
-import Button from '@/components/layout/Button'
+import { media } from '@src/theme'
+import StateProvider from '@components/StateProvider'
+import Button from '@components/layout/Button'
 
 const Container = styled.div(props => ({
   marginRight: `auto`,
@@ -24,7 +24,6 @@ const Title = styled.h2(props => ({
 }))
 
 const ContentWrapper = styled.div(props => ({
-  fontSize: `1.1rem`,
   textAlign: props.centeredCopy && `center`,
   overflow: `hidden`,
   transition: `max-height .3s`,
@@ -84,10 +83,9 @@ const TitledCopy: FunctionComponent<TitledCopyProps> = ({
           )}
         </ContentWrapper>
       )}
-      {spoiler &&
-        !state.spoilerOpen && (
-          <Button onClick={handleClick}>{spoilerLabel}</Button>
-        )}
+      {spoiler && !state.spoilerOpen && (
+        <Button onClick={handleClick}>{spoilerLabel}</Button>
+      )}
     </Container>
   )
 }

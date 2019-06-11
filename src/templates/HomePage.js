@@ -1,18 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
-import Img from 'gatsby-image'
+import Img from 'gatsby-image/withIEPolyfill'
 import Helmet from 'react-helmet'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 import slugify from 'slugify'
-import { Box, colors, fullPageWidth, maxWidthContent, media } from '@/theme'
-import MainLayout from '@/components/MainLayout'
-import { InstagramWidget } from '@/components/InstagramWidget'
-import { SupportWidget } from '@/components/Shared'
-import TitledCopy from '@/components/TitledCopy'
+import { Box, colors, fullPageWidth, maxWidthContent, media } from '@src/theme'
+import MainLayout from '@components/MainLayout'
+import { InstagramWidget } from '@components/InstagramWidget'
+import { SupportWidget } from '@components/Shared'
+import TitledCopy from '@components/TitledCopy'
+import { VideoPlayer } from '@gaiama/react-video-player'
 
 const IntroWrapper = styled(Box)`
   text-align: center;
+`
+
+const StyledVideoPlayer = styled(VideoPlayer)`
+  margin-top: 2rem;
 `
 
 const PageTitle = styled.h1`
@@ -26,44 +31,44 @@ const IntroCopy = styled.p`
   }
 `
 
-const IntroImagesOuter = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0 3rem;
-  ${media.greaterThan(`small`)} {
-    margin: 2rem 0 4rem;
-  }
-`
-const IntroImages = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  & > div {
-    box-shadow: 1px 1px 2px 1px ${colors.gray7};
-  }
-  & > div:nth-child(2) {
-    margin: 0 1rem;
-  }
-  & .gatsby-image-wrapper {
-    width: 200px;
-    width: 30vw;
-  }
-  ${media.greaterThan(`small`)} {
-    & .gatsby-image-wrapper {
-      width: 280px;
-      transition: width 0.3s ease-in-out;
-    }
-    & > .gatsby-image-wrapper:not(:nth-child(2)) {
-      width: 200px;
-    }
-    &:hover .gatsby-image-wrapper {
-      width: 200px;
-    }
-    & > .gatsby-image-wrapper:hover {
-      width: 280px;
-    }
-  }
-`
+// const IntroImagesOuter = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   margin: 2rem 0 3rem;
+//   ${media.greaterThan(`small`)} {
+//     margin: 2rem 0 4rem;
+//   }
+// `
+// const IntroImages = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   & > div {
+//     box-shadow: 1px 1px 2px 1px ${colors.gray7};
+//   }
+//   & > div:nth-of-type(2) {
+//     margin: 0 1rem;
+//   }
+//   & .gatsby-image-wrapper {
+//     width: 200px;
+//     width: 30vw;
+//   }
+//   ${media.greaterThan(`small`)} {
+//     & .gatsby-image-wrapper {
+//       width: 280px;
+//       /* transition: width 0.3s ease-in-out; */
+//     }
+//     & > .gatsby-image-wrapper:not(:nth-of-type(2)) {
+//       width: 200px;
+//     }
+//     /* &:hover .gatsby-image-wrapper {
+//       width: 200px;
+//     }
+//     & > .gatsby-image-wrapper:hover {
+//       width: 280px;
+//     } */
+//   }
+// `
 
 const StyledSupportWidget = styled(SupportWidget)`
   margin: 3rem 0;
@@ -145,7 +150,7 @@ const KeyPrincipleRowImages = styled.div`
 const KeyPrincipleRowImage = styled(Img)`
   width: 120px;
   ${media.greaterThan(`xsmall`)} {
-    width: 153px;
+    width: 152px;
   }
   margin: 0.2rem;
 `
@@ -198,13 +203,21 @@ const HomePage = props => (
         ))}
       </div>
 
-      <IntroImagesOuter>
+      {/* <IntroImagesOuter>
         <IntroImages>
           {props.data.page.frontmatter.intro.images.map(({ image }) => (
             <Img fluid={image.fluid} key={image.fluid.src} />
           ))}
         </IntroImages>
-      </IntroImagesOuter>
+      </IntroImagesOuter> */}
+
+      {props.data.page.frontmatter.video?.url && (
+        <StyledVideoPlayer
+          video={props.data.page.frontmatter.video.url}
+          thumbnail={props.data.page.frontmatter.video?.thumbnail.image}
+          label={props.data.SiteMeta.frontmatter.videoPlayerCookieButton}
+        />
+      )}
     </IntroWrapper>
 
     <KeyPrinciples
@@ -236,7 +249,7 @@ const HomePage = props => (
     <InstagramWidget
       user={props.data.instagram.frontmatter.instagramUser}
       followLink={props.data.instagram.frontmatter.followLink}
-      bg={props.data.instagram.frontmatter.bg.image.fluid.src}
+      bg={props.data.instagram.frontmatter.bg.image.fluid}
       images={props.data.instagramImages.edges}
     />
 
@@ -280,18 +293,9 @@ export const query = graphql`
     ...SupportWidget
 
     page: javascriptFrontmatter(fields: { url: { eq: $url } }) {
+      ...PageTranslations
       fields {
         url
-        translations {
-          fields {
-            url
-          }
-          frontmatter {
-            title
-            lang
-            slug
-          }
-        }
       }
       frontmatter {
         title
@@ -300,6 +304,16 @@ export const query = graphql`
         summary
         cover {
           publicURL
+        }
+        video {
+          url
+          thumbnail {
+            image: childImageSharp {
+              fluid(maxWidth: 760, quality: 75, cropFocus: ENTROPY) {
+                ...GatsbyImageSharpFluid
+              }
+            }
+          }
         }
         intro {
           title

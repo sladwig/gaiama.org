@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import styled from 'react-emotion'
-import Link from '@/components/Link'
-import Img from 'gatsby-image'
+import styled from '@emotion/styled'
+import Link from '@components/Link'
+import Img from 'gatsby-image/withIEPolyfill'
 import Headroom from 'react-headroom'
-import { visible } from '@/theme'
+import { visible } from '@src/theme'
 import style from './styles'
 
 const OnlyDesktop = styled.span(props => props.visible && visible.minMd)
@@ -81,10 +81,7 @@ class Header extends Component {
 
         <Banner>
           <Link to={homepage.fields.url}>
-            <Logo
-              fluid={logo.fluid}
-              alt="GaiAma Logo"
-            />
+            <Logo fluid={logo.fluid} alt="GaiAma Logo" />
           </Link>
         </Banner>
 

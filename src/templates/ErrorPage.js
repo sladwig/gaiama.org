@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
-import MainLayout from '@/components/MainLayout'
+import MainLayout from '@components/MainLayout'
 
+// pull in all content then maybe KCDs match-sorter to sort by urls
 const NotFound = props => (
   <MainLayout {...props}>
-    {/* {console.log(props)} */}
     <h1>{props.data.page.frontmatter.title}</h1>
   </MainLayout>
 )
@@ -29,15 +29,7 @@ export const query = graphql`
     page: javascriptFrontmatter(
       frontmatter: { slug: { eq: $slug }, lang: { eq: $lang } }
     ) {
-      fields {
-        translations {
-          frontmatter {
-            title
-            lang
-            slug
-          }
-        }
-      }
+      ...PageTranslations
       frontmatter {
         title
         lang

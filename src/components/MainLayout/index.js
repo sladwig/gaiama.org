@@ -1,40 +1,31 @@
+/* global document window */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+// import { Link } from 'gatsby'
 import Helmet from 'react-helmet'
-import { injectGlobal } from 'emotion'
+import { Global, css } from '@emotion/core'
 import { ToastContainer } from 'react-toastify'
 // import i18n from 'i18next'
 // import { I18nextProvider, translate } from 'react-i18next'
-import Header from '@/components/Header'
-import ReferrerMessages from '@/components/ReferrerMessages'
-import Footer from '@/components/Footer'
+import Header from '@components/Header'
+import ReferrerMessages from '@components/ReferrerMessages'
+import Footer from '@components/Footer'
 import * as QS from '@gaiama/query-string'
-import '@/utils/fontawesome'
+import '@src/utils/fontawesome'
 import {
-  colors,
+  // colors,
   media,
   screenReaderAndFocusable,
   focusOutlineNone,
   InstagramGradient,
   maxWidthLayout,
   maxWidthContent,
-} from '@/theme'
+} from '@src/theme'
+import { globalStyles } from './global.js'
 
 import './fragments'
 import 'react-toastify/dist/ReactToastify.css'
-// import 'typeface-amatic-sc'
-// import 'typeface-quicksand'
-
-// TODO: add PR to gatsby-remark-autolink-headers to disable floating
-// https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-remark-autolink-headers/src/gatsby-ssr.js#L10
-injectGlobal(`
-  .anchor {
-    float: none;
-  }
-  #nprogress .bar {
-    height: 5px !important;
-  }
-`)
+// import { CookieBanner } from '@components/CookieBanner.js'
 
 // const isDev = process.env.NODE_ENV === `development`
 
@@ -64,7 +55,7 @@ const generateMainMenu = items =>
 
 const generateMetaMenu = ({ translations, getLang, menuItems }) =>
   translations
-    .map(x => x.fields ? x : { frontmatter: {}, fields: {} })
+    .map(x => (x.fields ? x : { frontmatter: {}, fields: {} }))
     .map(x => ({
       ...getLang(x.frontmatter.lang),
       to: x.fields.url,
@@ -84,28 +75,6 @@ const generateMetaMenu = ({ translations, getLang, menuItems }) =>
 //   [lang]: { translations: messages }
 // })
 
-const getTranslations = page =>
-  [
-    ...(page.fields.translations || []),
-    {
-      fields: {
-        url: page.fields.url,
-      },
-      frontmatter: {
-        lang: page.frontmatter.lang,
-        slug: page.frontmatter.slug,
-        title: page.frontmatter.title,
-      },
-    },
-  ].sort(
-    (a, b) =>
-      a.frontmatter.lang < b.frontmatter.lang
-        ? -1
-        : a.frontmatter.lang > b.frontmatter.lang
-          ? 1
-          : 0
-  )
-
 // i18n.init({
 //   initImmediate: false,
 //   fallbackLng: `en`,
@@ -121,6 +90,16 @@ const getTranslations = page =>
 //     bindStore: false,
 //   },
 // })
+
+// const injectGTMCode = () => {
+//   const gtm = document.createElement(`script`)
+//   gtm.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+// new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+// j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+// 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+// })(window,document,'script','dataLayer','GTM-P2HCKV6');`
+//   document.head.insertBefore(gtm, document.head.children[1])
+// }
 
 class MainLayout extends Component {
   static propTypes = {
@@ -144,8 +123,14 @@ class MainLayout extends Component {
       console.log(`Thank you for installing our app!`, event)
     }
 
-    /* eslint-disable-next-line no-undef */
     window.onappinstalled = handleInstall
+
+    if (typeof window !== `undefined`) {
+      window.GaiAma = {
+        ...window.GaiAma,
+        accounts: this.props.data.Accounts.frontmatter.accounts,
+      }
+    }
   }
 
   render() {
@@ -160,7 +145,7 @@ class MainLayout extends Component {
 
     const lang = pageContext.lang
     // const i18nStore = getI18nStore(lang, pageContext.messages)
-    const translations = getTranslations(page)
+    const translations = page.fields.translations
     const getLang = getLangFactory(languages.edges)
     const menuItems = menu.edges || []
     const mainMenu = generateMainMenu(menuItems)
@@ -180,15 +165,16 @@ class MainLayout extends Component {
     return (
       // <I18nextProvider //   i18n={i18n} //   initialLanguage={lang} //   initialI18nStore={i18nStore} // >
       <div
-        css={{
-          width: [`100%`, `100vw`],
-          ...maxWidthLayout,
-          margin: `0 auto`,
-          wordBreak: `keep-all`,
-        }}
+        css={css`
+          width: 100%;
+          width: 100vw;
+          ${maxWidthLayout};
+          margin: 0 auto;
+          word-break: keep-all;
+        `}
       >
         <Helmet
-          titleTemplate={`%s - ${site.siteMetadata.title}`}
+          titleTemplate={`%s ♡ ${site.siteMetadata.title}`}
           defaultTitle={page.frontmatter.title}
         >
           <title>{page.frontmatter.title}</title>
@@ -197,47 +183,19 @@ class MainLayout extends Component {
             itemProp="description"
             content={page.frontmatter.summary || page.frontmatter.excerpt}
           />
-
-          <link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href="/apple-touch-icon.png?v=1"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="/favicon-32x32.png?v=1"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="16x16"
-            href="/favicon-16x16.png?v=1"
-          />
-          <link rel="manifest" href="/site.webmanifest?v=1" />
-          <link rel="shortcut icon" href="/favicon.ico?v=1" />
           <meta
             name="apple-mobile-web-app-title"
             content={site.siteMetadata.title}
           />
           <meta name="application-name" content={site.siteMetadata.title} />
-          <meta name="msapplication-TileColor" content={colors.primaryLite} />
-          <meta name="theme-color" content={colors.primaryLite} />
 
-          {/* <meta name="msapplication-config" content="browserconfig.xml" /> */}
-
-          {/* facebook */}
           <meta property="og:site_name" content={site.siteMetadata.title} />
           <meta
             property="og:url"
             content={`${site.siteMetadata.siteUrl}${page.fields.url}`}
           />
-          <meta
-            property="og:locale"
-            content={getLang(page.frontmatter.lang).lc}
-          />
-          {getLang(page.frontmatter.lang, true).map(x => (
+          <meta property="og:locale" content={getLang(lang).lc} />
+          {getLang(lang, true).map(x => (
             <meta property="og:locale:alternate" content={x.lc} key={x.lc} />
           ))}
           <meta
@@ -258,15 +216,7 @@ class MainLayout extends Component {
           {/* <meta property="og:image:alt" content={`A shiny red apple with a bite taken out`} /> */}
 
           {/* twitter */}
-          {/* <meta
-            property="twitter:site"
-            content={
-              `hellogaiama`
-              // this.props.data.Accounts.frontmatter.accounts.find(
-              //   x => x.service === `twitter`
-              // ).handle
-            }
-          /> */}
+          <meta property="twitter:site" content="hellogaiama" />
           <meta name="twitter:card" content="summary_large_image" />
 
           {[`/en`, `/de`].includes(location.pathname) && (
@@ -307,6 +257,8 @@ class MainLayout extends Component {
           {/* <body className={slugify(page.fields.url)} /> */}
         </Helmet>
 
+        <Global styles={css(globalStyles)} />
+
         <a href="#main" css={screenReaderAndFocusable}>
           {SiteMeta.frontmatter.skipLinks.toContent}
         </a>
@@ -329,18 +281,17 @@ class MainLayout extends Component {
         <main
           id="main"
           tabIndex="-1"
-          css={{
-            ...focusOutlineNone,
-            margin: `0 auto`,
-            // padding: `3rem .8rem 1.45rem`,
-            padding: `3rem 0 1.45rem`,
-            width: !wrapperStyles.width && `98%`,
-            ...maxWidthContent,
-            [media.greaterThan(`medium`)]: {
-              width: !wrapperStyles.width && `90%`,
-            },
-            ...wrapperStyles,
-          }}
+          css={css`
+            ${focusOutlineNone};
+            margin: 0 auto;
+            padding: 3rem 0 1.45rem;
+            width: ${!wrapperStyles.width && `98%`};
+            ${maxWidthContent};
+            ${media.greaterThan(`medium`)} {
+              width: ${!wrapperStyles.width && `90%`};
+            }
+            ${wrapperStyles};
+          `}
         >
           {this.props.children}
         </main>
@@ -353,8 +304,44 @@ class MainLayout extends Component {
           legal={this.props.data.legal.edges}
           bgImage={SiteMeta.frontmatter.assets.headerBg.image}
           accounts={this.props.data.Accounts}
-          info={SiteMeta.htmlAst}
+          info={SiteMeta.code.body}
+          sponsors={SiteMeta.frontmatter.sponsors}
         />
+
+        {/* <CookieBanner onAccept={injectGTMCode}>
+          {({ setAccept, setReject }) => (
+            <div
+              css={css`
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                color: #fff;
+                background: ${colors.primaryLite};
+                padding: 1rem;
+                z-index: 10;
+                display: flex;
+                align-content: center;
+                justify-content: space-between;
+              `}
+            >
+              <div>
+                Cookie Banner
+                <span
+                  css={css`
+                    font-size: smaller;
+                  `}
+                >
+                  <Link to="/datenschutz">Datenschutz</Link>
+                </span>
+              </div>
+              <div>
+                <button onClick={setReject}>Reject</button>
+                <button onClick={setAccept}>Accept</button>
+              </div>
+            </div>
+          )}
+        </CookieBanner> */}
 
         <InstagramGradient />
         <ToastContainer position="bottom-right" />

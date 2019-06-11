@@ -1,4 +1,4 @@
-import { colors, fontFamilies, media } from '@/theme'
+import { colors, fontFamilies, media } from '@src/theme'
 
 /**
  *
@@ -13,6 +13,7 @@ export default {
     position: `relative`,
     color: colors.darkWhite,
     whiteSpace: `nowrap`,
+    fontWeight: 100,
 
     '& a': {
       color: colors.darkWhite,
@@ -98,14 +99,14 @@ export default {
   headerLogo: {
     display: `block`,
     position: `relative`,
-    transform: `translateY(-1.7rem)`,
+    // transform: `translateY(-1.7rem)`,
     margin: `0 auto`,
     maxWidth: `140px`,
     userSelect: `none`,
 
     [media.greaterThan(`small`)]: {
       maxWidth: `250px`,
-      transform: `translateY(-2.2rem)`,
+      // transform: `translateY(-2.2rem)`,
     },
     [media.greaterThan(`large`)]: { maxWidth: `420px` },
   },
@@ -159,13 +160,46 @@ export default {
     textAlign: `right`,
     fontFamily: fontFamilies.accent,
 
-    [media.greaterThan(`xsmall`)]: { height: `2.5rem`, width: `90%` },
-    [media.greaterThan(`small`)]: { height: `3.5rem` },
+    [media.greaterThan(`xsmall`)]: { height: `2.5rem`, width: `98%` },
+    [media.greaterThan(`small`)]: { height: `3.5rem`, width: `90%` },
     [media.greaterThan(`large`)]: { height: `4rem` },
   },
 
   headerNavItem: {
     height: `100%`,
+
+    span: {
+      width: `100%`,
+    },
+
+    '&:last-child': {
+      height: `auto`,
+
+      a: {
+        background: `#bfde2c`,
+        fontWeight: `400`,
+        borderRadius: `3px`,
+        color: `#042f37`,
+        fontSize: `1.2rem`,
+        padding: `0.2rem 0.7rem`,
+      },
+
+      [media.lessThan(`small`)]: {
+        position: `absolute`,
+        bottom: `2.6rem`,
+        right: `7px`,
+
+        a: {
+          borderRadius: `50%`,
+          width: `3.3rem`,
+          height: `3.3rem`,
+          fontSize: `0.8rem`,
+          textAlign: `center`,
+          padding: `0`,
+          transform: `rotate(10deg)`,
+        },
+      },
+    },
 
     [media.greaterThan(`small`)]: { fontSize: `1.2rem` },
   },
@@ -174,9 +208,11 @@ export default {
     display: `block`,
     color: colors.darkWhite,
     position: `relative`,
+    border: `none`,
     // zIndex: 1,
 
     ':hover, :active, :focus': {
+      backgroundColor: `transparent`,
       color: colors.darkWhite,
       textDecoration: `none`,
     },
@@ -199,6 +235,7 @@ export default {
     // transition: `transform .2s`,
     // WebkitFilter: `blur(0)`,
     '&:hover': {
+      backgroundColor: `transparent`,
       transform: `scale(1.048, 1.048)`,
     },
   },

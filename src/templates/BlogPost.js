@@ -1,19 +1,27 @@
-import React, { createElement } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
+import MDXRenderer from 'gatsby-mdx/mdx-renderer'
+import { css } from '@emotion/core'
 import Head from 'react-helmet'
-import rehypeReact from 'rehype-react'
-import MainLayout from '@/components/MainLayout'
-import Link from '@/components/Link'
-import ShareWidget from '@/components/ShareWidget'
-import { SupportWidget } from '@/components/Shared'
-import Newsticker from '@/components/Newsticker'
-import PodcastPlayer from '@/components/PodcastPlayer'
-import { colors, fontFamilies, gradients, media } from '@/theme'
+import MainLayout from '@components/MainLayout'
+import Link from '@components/Link'
+import ShareWidget from '@components/ShareWidget'
+import { SupportWidget } from '@components/Shared'
+import Newsticker from '@components/Newsticker'
+import { VideoPlayer } from '@gaiama/react-video-player'
+import PodcastPlayer from '@components/PodcastPlayer'
+import { colors, fontFamilies, gradients, media } from '@src/theme'
 
 const BlogPost = props => {
-  const { page: post, BlogPost, NewsTicker, PodcastPlayerMeta } = props.data
-
+  const {
+    page: post,
+    BlogPost,
+    BlogPage,
+    NewsTicker,
+    PodcastPlayerMeta,
+  } = props.data
+  const { newer, older } = post
   return (
     <MainLayout {...props}>
       <Head
@@ -61,7 +69,17 @@ const BlogPost = props => {
           }
         />
 
-        <PostBody>{renderAst(post.htmlAst)}</PostBody>
+        <PostBody>
+          {post.frontmatter.video?.url && (
+            <VideoPlayer
+              video={post.frontmatter.video.url}
+              thumbnail={post.frontmatter.video.thumbnail?.image}
+              label={props.data.SiteMeta.frontmatter.videoPlayerCookieButton}
+            />
+          )}
+
+          <MDXRenderer>{post.code.body}</MDXRenderer>
+        </PostBody>
       </article>
 
       <ShareWidget
@@ -74,10 +92,10 @@ const BlogPost = props => {
         linkLabelFull={BlogPost.frontmatter.shareUrl.linkLabelFull}
         post={post}
         siteUrl={props.data.site.siteMetadata.siteUrl}
-        css={{
-          margin: `2rem auto 4rem`,
-          maxWidth: `760px`,
-        }}
+        css={css`
+          margin: 2rem auto 4rem;
+          max-width: 760px;
+        `}
       />
 
       <SupportWidget
@@ -91,12 +109,14 @@ const BlogPost = props => {
         bankInfo={props.data.SupportWidget.frontmatter.bankInfo}
         bankDetails={props.data.SupportWidget.frontmatter.bankDetails}
         lang={props.pageContext.lang}
-        css={{ margin: `0 0 3rem` }}
+        css={css`
+          margin: 0 0 3rem;
+        `}
       />
 
-      {post.fields.suggested && (
+      {post.suggested?.length && (
         <Newsticker
-          items={post.fields.suggested}
+          items={post.suggested}
           title={BlogPost.frontmatter.relatedArticlesLabel}
           linkLabel={NewsTicker.frontmatter.linkLabel}
           link={NewsTicker.frontmatter.link}
@@ -106,51 +126,60 @@ const BlogPost = props => {
       )}
 
       <div
-        css={{
-          display: `flex`,
-          justifyContent: `center`,
-          textAlign: `center`,
-          margin: `2rem auto 3rem`,
-          overflow: `hidden`,
-          width: `99%`,
-          [media.greaterThan(`medium`)]: {
-            width: `80%`,
-          },
-          position: `relative`,
-          '&:before': {
-            content: `""`,
-            height: `1px`,
-            width: `100%`,
-            position: `absolute`,
-            display: `block`,
-            top: `50%`,
-            right: `0`,
-            left: `0`,
-            background: `linear-gradient(to right, rgba(204,204,204,0.13), #abaaaa, rgba(204,204,204,0.13)) no-repeat`,
-          },
-        }}
+        css={css`
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          margin: 2rem auto 3rem;
+          overflow: hidden;
+          width: 99%;
+          ${media.greaterThan(`medium`)} {
+            width: 80%;
+          }
+          position: relative;
+          &:before {
+            content: '';
+            height: 1px;
+            width: 100%;
+            position: absolute;
+            display: block;
+            top: 50%;
+            right: 0;
+            left: 0;
+            background: linear-gradient(
+                to right,
+                rgba(204, 204, 204, 0.13),
+                #abaaaa,
+                rgba(204, 204, 204, 0.13)
+              )
+              no-repeat;
+          }
+        `}
       >
         <div
-          css={{
-            position: `relative`,
-            display: `flex`,
-            justifyContent: `space-between`,
-            background: `#fff`,
-          }}
+          css={css`
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+          `}
         >
-          {[`older`, `all`, `newer`].map(
+          {[older, BlogPage, newer].map(
             x =>
-              post.fields[x] && (
+              post.fields[x]?.url && (
                 <div
                   key={post.fields[x].fields.url}
-                  css={{
-                    padding: `.5rem`,
-                    margin: `0 2rem`,
-                  }}
+                  css={css`
+                    padding: 0.5rem;
+                    margin: 0 2rem;
+                  `}
                 >
                   <Link
                     to={post.fields[x].fields.url}
                     title={post.fields[x].frontmatter.title}
+                    css={css`
+                      border: none;
+                    `}
                   >
                     {BlogPost.frontmatter.pager[x]}
                   </Link>
@@ -209,7 +238,49 @@ export const query = graphql`
       }
     }
 
-    page: markdownRemark(fields: { url: { eq: $url } }) {
+    BlogPage: javascriptFrontmatter(
+      frontmatter: { layout: { eq: "BlogPage" } }
+      fields: { lang: { eq: $lang } }
+    ) {
+      frontmatter {
+        title
+      }
+      fields {
+        url
+      }
+    }
+
+    page: mdx(fields: { type: { eq: "post" }, url: { eq: $url } }) {
+      code {
+        body
+      }
+      frontmatter {
+        title
+        #subtitle
+        #id
+        #oldId
+        #slug
+        lang
+        summary
+        #tweet_id
+        cover {
+          publicURL
+        }
+        podcast {
+          audio
+          video
+        }
+        video {
+          url
+          thumbnail {
+            image: childImageSharp {
+              fluid(maxWidth: 760, quality: 75, cropFocus: ENTROPY) {
+                ...GatsbyImageSharpFluid
+              }
+            }
+          }
+        }
+      }
       fields {
         dateTime
         dateStr
@@ -226,102 +297,51 @@ export const query = graphql`
             slug
           }
         }
-        newer {
-          frontmatter {
-            title
-          }
-          fields {
-            url
-          }
+      }
+      newer {
+        frontmatter {
+          title
         }
-        all {
-          frontmatter {
-            title
-          }
-          fields {
-            url
-          }
+        fields {
+          url
         }
-        older {
-          frontmatter {
-            title
-          }
-          fields {
-            url
-          }
+      }
+      older {
+        frontmatter {
+          title
         }
-        suggested {
-          excerpt(pruneLength: 135)
-          fields {
-            url
-          }
-          frontmatter {
-            id
-            title
-            lang
-            slug
-            summary
-            cover {
-              image: childImageSharp {
-                fluid(
-                  maxWidth: 400
-                  maxHeight: 230
-                  quality: 75
-                  cropFocus: ENTROPY
-                ) {
-                  ...GatsbyImageSharpFluid
-                }
+        fields {
+          url
+        }
+      }
+      suggested(count: 3) {
+        excerpt(pruneLength: 135)
+        fields {
+          url
+        }
+        frontmatter {
+          id
+          title
+          lang
+          slug
+          summary
+          cover {
+            image: childImageSharp {
+              fluid(
+                maxWidth: 400
+                maxHeight: 230
+                quality: 75
+                cropFocus: ENTROPY
+              ) {
+                ...GatsbyImageSharpFluid
               }
             }
           }
         }
       }
-      htmlAst
-      frontmatter {
-        title
-        subtitle
-        id
-        oldId
-        slug
-        lang
-        summary
-        tweet_id
-        cover {
-          publicURL
-        }
-        podcast {
-          audio
-          video
-        }
-      }
     }
   }
 `
-
-// const GaimaImage = ({ aspectRatio, children }) => (
-//   <div css={{ flex: aspectRatio }}>{children}</div>
-// )
-// GaimaImage.propTypes = {
-//   aspectRatio: PropTypes.string,
-// }
-
-// const GaimaVideo = ({ preview, src, width, height }) => (
-//   // <iframe src={children} title={children}></iframe>
-//   <div>
-//     <img src={preview} alt="video preview" width={width} height={height} />
-//     <iframe src={src} width={width} height={height} title="youtube video" />
-//   </div>
-// )
-// GaimaVideo.propTypes = {
-//   preview: PropTypes.string,
-//   src: PropTypes.string,
-//   width: PropTypes.string,
-//   height: PropTypes.string,
-// }
-
-const renderAst = new rehypeReact({
-  createElement,
-}).Compiler
 
 const PostHeader = ({
   title,
@@ -334,68 +354,87 @@ const PostHeader = ({
   shortUrl,
 }) => (
   <div
-    css={{
-      margin: 0,
-    }}
+    css={css`
+      margin: 0;
+    `}
   >
     <h1
       itemProp="headline"
-      css={{ maxWidth: [`51rem`, `40ch`], margin: `0 auto` }}
+      css={css`
+        max-width: 51rem;
+        max-width: 40ch;
+        margin: 0 auto;
+        text-align: center;
+      `}
     >
       {title}
     </h1>
     {subtitle && (
-      <h3 css={{ maxWidth: [`50.7rem`, `48.7ch`], margin: `1rem auto 0` }}>
+      <h3
+        css={css`
+          max-width: 50.7rem;
+          max-width: 48.7ch;
+          margin: 1rem auto 0;
+        `}
+      >
         {subtitle}
       </h3>
     )}
 
     <div
-      css={{
-        display: `block`,
-        textAlign: `center`,
-        fontSize: `.8rem`,
-        margin: `1rem auto 0`,
-        width: `90%`,
-        position: `relative`,
-        [media.greaterThan(`small`)]: {
-          width: `60%`,
-        },
-        [media.greaterThan(`medium`)]: {
-          width: `30%`,
-        },
-        '&:before': {
-          content: `""`,
-          height: `1px`,
-          width: `100%`,
-          position: `absolute`,
-          display: `block`,
-          top: `50%`,
-          left: `0`,
-          right: `0`,
-          background: `linear-gradient(to right, rgba(204,204,204,0.13), #abaaaa, rgba(204,204,204,0.13)) no-repeat`,
-        },
-      }}
+      css={css`
+        display: block;
+        text-align: center;
+        font-size: 0.8rem;
+        margin: 1rem auto 0;
+        width: 90%;
+        position: relative;
+        ${media.greaterThan(`small`)} {
+          width: 60%;
+        }
+        ${media.greaterThan(`medium`)} {
+          width: 30%;
+        }
+        &:before {
+          content: '';
+          height: 1px;
+          width: 100%;
+          position: absolute;
+          display: block;
+          top: 50%;
+          left: 0;
+          right: 0;
+          background: linear-gradient(
+              to right,
+              rgba(204, 204, 204, 0.13),
+              #abaaaa,
+              rgba(204, 204, 204, 0.13)
+            )
+            no-repeat;
+        }
+      `}
     >
       <Link to={shortUrl} title={shortUrl} ext>
         <time
           itemProp="datePublished"
           content={dateTime}
           dateTime={dateTime}
-          css={{
-            position: `relative`,
-            display: `inline-block`,
-            background: `#fff`,
-            color: colors.black,
-            padding: `0 .5rem`,
-          }}
+          css={css`
+            position: relative;
+            display: inline-block;
+            background: #fff;
+            color: ${colors.black};
+            padding: 0 0.5rem;
+          `}
         >
           {dateStrLocalized}
         </time>
       </Link>
     </div>
 
-    <PodcastPlayer podcast={podcast} meta={podcastPlayerMeta.frontmatter} />
+    {podcast && (
+      <PodcastPlayer podcast={podcast} meta={podcastPlayerMeta.frontmatter} />
+    )}
   </div>
 )
 PostHeader.propTypes = {
@@ -412,101 +451,107 @@ PostHeader.propTypes = {
 
 const PostBody = ({ children }) => (
   <div
-    css={{
-      wordBreak: `break-word`,
-      wordWrap: `break-word`,
-      '& > div > *': {
-        maxWidth: [`50rem`, `80ch`],
-        marginTop: `2.5rem`,
-        marginBottom: 0,
-        // we reset inline-galleries later
-        marginRight: `auto`,
-        marginLeft: `auto`,
-      },
-      '& h2, & h3, & h4, & h5, & h6': {
-        marginTop: `2rem`,
-        maxWidth: [`50.3rem`, `51.4ch`],
-      },
-      '& h3': { fontSize: `1.7rem` },
-      '& p:first-child': {
-        marginTop: `3rem`,
-      },
-      '& p + p': {
-        marginTop: `1.5rem`,
-      },
-      '& ul, & ol': {
-        listStylePosition: `inside`,
-      },
-      '& .inline-gallery': {
-        maxWidth: `100%`,
-        display: `flex`,
-        justifyContent: `center`,
-        [media.lessThan(`small`)]: {
-          flexDirection: `column`,
-          alignItems: `center`,
-          '& > *': {
-            marginTop: `1rem`,
-          },
-        },
-        '& > *': {
-          width: 600,
-          maxWidth: `80%`,
-          margin: `0 .5rem`,
-        },
-        // '& > *:first-child, & > *:last-child': {
-        //   marginRight: `auto`,
-        //   marginLeft: `auto`,
-        // },
-      },
-      '& .inline-gallery + .inline-gallery': {
-        marginTop: `1rem`,
-      },
-      '& figure': {
-        position: `relative`,
-        '& > figcaption': {
-          display: `flex`,
-          background: gradients.primary,
-          position: `absolute`,
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          color: colors.darkWhite,
-          padding: `.5rem`,
-          justifyContent: `center`,
-          alignItems: `center`,
-          textAlign: `center`,
-          fontFamily: fontFamilies.accent,
-          fontSize: `1.4rem`,
-          letterSpacing: `.1rem`,
-          overflow: `hidden`,
-          transition: `all .35s`,
-          opacity: 0,
-          userSelect: `none`,
-        },
-        '&:hover > figcaption': {
-          opacity: 1,
-        },
-      },
-      // '& .video-wrapper': {
-      //   position: `relative`,
-      //   overflow: `hidden`,
-      //   paddingTop: `29.25%`,
-      //   width: `98%`,
-      //   maxWidth: `700px`,
-      //   margin: `0 auto 3rem`,
-      //   '& > iframe': {
-      //     position: `absolute`,
-      //     top: `0`,
-      //     left: `0`,
-      //     width: `100%`,
-      //     height: `100%`,
-      //     border: `0`,
-      //   },
-      // },
-      '& iframe': { border: 0 },
-      'li p': { margin: `0 !important`, display: `inline` },
-    }}
+    className="postBody"
+    css={css`
+      word-break: break-word;
+      word-wrap: break-word;
+      & > div > * {
+        max-width: 50rem;
+        max-width: 80ch;
+        margin-top: 2.5rem;
+        margin-bottom: 0;
+        margin-right: auto;
+        margin-left: auto;
+      }
+      & h2,
+      & h3,
+      & h4,
+      & h5,
+      & h6 {
+        margin-top: 2rem;
+        max-width: 50.3rem;
+        max-width: 51.4ch;
+      }
+      & h3 {
+        font-size: 1.7rem;
+      }
+      & p:first-of-type {
+        margin-top: 3rem;
+      }
+      & p + p {
+        margin-top: 1.5rem;
+      }
+      & ul,
+      & ol {
+        list-style-position: inside;
+      }
+      /**
+       * TODO: check out grids
+       * https://cloudfour.com/thinks/breaking-out-with-css-grid-layout/
+       * https://gedd.ski/post/article-grid-layout/
+      */
+      & .inline-gallery {
+        max-width: 100%;
+        display: flex;
+        justify-content: center;
+        ${media.lessThan(`small`)} {
+          flex-direction: column;
+          align-items: center;
+          & > * {
+            margin-top: 1rem;
+          }
+        }
+        & > * {
+          width: 600px;
+          max-width: 80%;
+          margin: 0 0.5rem;
+        }
+      }
+      & .inline-gallery + .inline-gallery {
+        margin-top: 1rem;
+      }
+      & figure {
+        position: relative;
+        & > figcaption {
+          display: flex;
+          background: ${gradients.primary};
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          color: ${colors.darkWhite};
+          padding: 0.5rem;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          font-family: ${fontFamilies.accent};
+          font-size: 1.4rem;
+          letter-spacing: 0.1rem;
+          overflow: hidden;
+          transition: all 0.35s;
+          opacity: 0;
+          user-select: none;
+        }
+        &:hover > figcaption {
+          opacity: 1;
+        }
+      }
+      & iframe {
+        border: 0;
+      }
+      li p {
+        margin: 0 !important;
+        display: inline;
+      }
+      a.anchor {
+        border: none;
+        :hover {
+          background-color: transparent;
+          color: ${colors.link};
+        }
+      }
+    `}
   >
     {children}
   </div>

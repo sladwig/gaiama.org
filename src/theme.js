@@ -1,25 +1,33 @@
-/* global window */
+/**
+ * Build reusable React components that can be styled with css, css modules, inline styles & many css-in-js libs
+ * https://github.com/jfschwarz/substyle
+ *
+ * maybe https://wiredjs.com/ ? "hand" drawn components?
+ * maybe https://github.com/bradlc/babel-plugin-tailwind-components ?
+ */
 import React from 'react'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
+import { css } from '@emotion/core'
 import propStyles from 'prop-styles'
 import preval from 'babel-plugin-preval/macro'
 
 export const colors = preval`
   const h2a = require('hex2rgba')
   const primary = '#042f37'
+  const primaryLite = '#287482'
   module.exports = {
     transparent: 'transparent',
     primary,
+    primaryLite,
     primary58: h2a(primary, 0.58),
     primary72: h2a(primary, 0.72),
     primary85: h2a(primary, 0.85),
-    primaryLite: '#287482',
     white: '#fff',
     darkWhite: '#e2e2e2',
     creme: '#fafafa',
     lightBlue: '#f3f8fd',
     // lightBlue: '#f1f4f8',
-    link: '#0e91a0',
+    link: primaryLite, // axe '#0A616C', // before Lighthouse: '#0e91a0', 
     // linkHover: '#0fc1d6',
     linkHover: '#0a474e',
     // link: '#13abaa',
@@ -47,10 +55,10 @@ export const colors = preval`
     rss: '#faa949',
     success: '#74d27e',
     failure: '#d27474',
+    yellow: '#ff0',
     brands: {
       facebook: '#4466b3',
       twitter: '#1ca1f3',
-      telegram: '#1d95d3',
       gplus: '#dc4436',
       youtube: '#fd1402',
       github: '#24292e',
@@ -58,16 +66,17 @@ export const colors = preval`
     },
   }
 `
-if (typeof window !== `undefined`) {
-  window.GaiAma = {
-    ...window.GaiAma,
-    colors,
-  }
-}
 
 export const gradients = {
   primary: `linear-gradient(to right, rgba(4,47,55,0.58), rgba(4,47,55,0.72))`,
 }
+
+export const ignoreInPrint = css`
+  @media print {
+    display: none;
+    visibility: hidden;
+  }
+`
 
 export const screenReaderOnly = {
   position: `absolute`,
@@ -106,12 +115,12 @@ export const focusOutlineNone = {
 // hide svg definitions from https://stackoverflow.com/a/24820654/3484824
 export const InstagramGradient = props => (
   <div
-    css={{
-      height: `0`,
-      width: `0`,
-      position: `absolute`,
-      visibility: `hidden`,
-    }}
+    css={css`
+      height: 0;
+      width: 0;
+      position: absolute;
+      visibility: hidden;
+    `}
   >
     <svg width="0" height="0">
       <radialGradient id="InstagramGradient" r="150%" cx="30%" cy="107%">
@@ -145,7 +154,7 @@ export const SIZES = {
   medium: { min: 851, max: 992 },
   large: { min: 993, max: 1024 },
   xlarge: { min: 1025, max: 1200 },
-  xxlarge: { min: 1021, max: 1290 },
+  xxlarge: { min: 1201, max: 1290 },
   xxxlarge: { min: 1291, max: Infinity },
   // xsmall: { min: 0, max: 599 },
   // small: { min: 600, max: 779 },

@@ -1,0 +1,8 @@
+{
+  "name": "@gaiama/gatsby-source-gaiama-donations",
+  "version": "0.1.3",
+  "dependencies": {
+    "@gaiama/helpers": "0.1.0",
+    "aws-sdk": "^2.437.0"
+  }
+}

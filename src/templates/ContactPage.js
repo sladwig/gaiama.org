@@ -1,12 +1,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
-import MainLayout from '@/components/MainLayout'
+import styled from '@emotion/styled'
+import { css } from '@emotion/core'
+import MainLayout from '@components/MainLayout'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { colors, media } from '@/theme'
-import TitledCopy from '@/components/TitledCopy'
-import { Newsletter } from '@/components/NewsletterWidget'
-import ContactForm from '@/components/ContactForm'
+// import { faRssSquare } from '@fortawesome/free-solid-svg-icons/faRssSquare'
+import { colors, media } from '@src/theme'
+import TitledCopy from '@components/TitledCopy'
+import { Newsletter } from '@components/NewsletterWidget'
+import ContactForm from '@components/ContactForm'
+
+const StyledA = styled.a`
+  border: none;
+  :hover {
+    background-color: transparent;
+  }
+`
 
 const ContactPage = props => {
   const { page } = props.data
@@ -35,111 +45,111 @@ const ContactPage = props => {
         einverstanden ([LINK]Datenschutzerklärung und Widerrufshinweise[/LINK])
       </p> */}
       <div
-        css={{
-          overflow: `hidden`,
-          padding: `.2rem`,
-          display: `flex`,
-          justifyContent: `space-between`,
-          [media.lessThan(`xsmall`)]: {
-            flexDirection: `column`,
-          },
-          [media.greaterThan(`xsmall`)]: {
-            '& > div': {
-              width: `40%`,
-            },
-          },
-          [media.greaterThan(`medium`)]: {
-            width: `57%`,
-            margin: `3rem 2rem 0 6rem`,
-          },
-        }}
+        css={css`
+          overflow: hidden;
+          padding: 0.2rem;
+          display: flex;
+          justify-content: space-between;
+          ${media.lessThan(`xsmall`)} {
+            flex-direction: column;
+          }
+          ${media.greaterThan(`xsmall`)} {
+            & > div {
+              width: 40%;
+            }
+          }
+          ${media.greaterThan(`medium`)} {
+            width: 57%;
+            margin: 3rem 2rem 0 6rem;
+          }
+        `}
       >
         <div
-          css={{
-            marginBottom: `3rem`,
-          }}
+          css={css`
+            margin-bottom: 3rem;
+          `}
         >
           <TitledCopy
             rank="1"
             full
             title={page.frontmatter.title}
             // paragraphs={page.frontmatter.form.descr}
-            css={{
-              marginBottom: `1.5rem`,
-              '& h2': {
-                marginBottom: `1rem`,
-              },
-              '& div': {
-                fontSize: `.9rem`,
-              },
-              [media.lessThan(`xsmall`)]: {
-                textAlign: `center`,
-              },
-            }}
+            css={css`
+              margin-bottom: 1.5rem;
+              & h2 {
+                margin-bottom: 1rem;
+              }
+              & div {
+                font-size: 0.9rem;
+              }
+              ${media.lessThan(`xsmall`)} {
+                text-align: center;
+              }
+            `}
           />
 
           <div
-            css={{
-              display: `flex`,
-              justifyContent: `space-between`,
-              [media.lessThan(`small`)]: {
-                marginBottom: `2rem`,
-              },
-              '& > div': {
-                // position: `relative`,
-                // zIndex: 3,
-                marginBottom: `1.5rem`,
-                '& > a': {
-                  color: colors.purpleDark,
-                },
-              },
-            }}
+            css={css`
+              display: flex;
+              justify-content: space-between;
+              ${media.lessThan(`small`)} {
+                margin-bottom: 2rem;
+              }
+              & > div {
+                margin-bottom: 1.5rem;
+                & > a {
+                  color: ${colors.purpleDark};
+                }
+              }
+            `}
           >
             {props.data.Accounts.frontmatter.accounts
               .filter(x => x.meta !== `true`)
               .map(x => (
                 <div
                   key={x.service}
-                  css={{
-                    '& svg': x.service !== `instagram` && {
-                      color: colors.brands[x.service],
-                    },
-                    '& svg *': x.service === `instagram` && {
-                      fill: `url(#InstagramGradient)`,
-                    },
-                    '&:hover svg': {
-                      color: colors.black,
-                    },
-                  }}
+                  css={css`
+                    & svg {
+                      color: ${x.service !== `instagram` &&
+                        colors.brands[x.service]};
+                    }
+                    & svg * {
+                      fill: ${x.service === `instagram` &&
+                        `url(#InstagramGradient)`};
+                    }
+                    &:hover svg {
+                      color: ${colors.black};
+                    }
+                  `}
                 >
-                  <a
+                  <StyledA
                     href={x.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={x.description}
                   >
                     <FontAwesomeIcon icon={[`fab`, x.icon]} size="lg" />
-                  </a>
+                  </StyledA>
                 </div>
               ))}
-            <div
-              css={{
-                '& svg': {
-                  color: colors.rss,
-                },
-                '&:hover svg': {
-                  color: colors.black,
-                },
-              }}
+            {/* <div
+              css={css`
+                & svg {
+                  color: ${colors.rss};
+                }
+                &:hover svg {
+                  color: ${colors.black};
+                }
+              `}
             >
-              <a
+              <StyledA
                 href={`/${props.pageContext.lang}/blog/rss.xml`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FontAwesomeIcon icon={[`fas`, `rss-square`]} size="lg" />
-              </a>
-            </div>
+                <FontAwesomeIcon icon={faRssSquare} size="lg" />
+              </StyledA>
+            </div> */}
           </div>
 
           <ContactForm
@@ -160,27 +170,27 @@ const ContactPage = props => {
         </div>
 
         <div
-          css={{
-            display: `flex`,
-          }}
+          css={css`
+            display: flex;
+          `}
         >
           <div>
             <TitledCopy
               full
               title={page.frontmatter.newsletter.title}
               paragraphs={page.frontmatter.newsletter.descr}
-              css={{
-                marginBottom: `1.3rem`,
-                '& h2': {
-                  marginBottom: `1rem`,
-                },
-                '& div': {
-                  fontSize: `.9rem`,
-                },
-                [media.lessThan(`xsmall`)]: {
-                  textAlign: `center`,
-                },
-              }}
+              css={css`
+                margin-bottom: 1.3rem;
+                & h2 {
+                  margin-bottom: 1rem;
+                }
+                & div {
+                  font-size: 0.9rem;
+                }
+                ${media.lessThan(`xsmall`)} {
+                  text-align: center;
+                }
+              `}
             />
             <Newsletter
               emailLabel={page.frontmatter.form.emailLabel}
@@ -219,18 +229,9 @@ export const query = graphql`
     ...Accounts
 
     page: javascriptFrontmatter(frontmatter: { slug: { eq: $slug } }) {
+      ...PageTranslations
       fields {
         url
-        translations {
-          fields {
-            url
-          }
-          frontmatter {
-            title
-            lang
-            slug
-          }
-        }
       }
       frontmatter {
         title
@@ -275,7 +276,7 @@ export const query = graphql`
 
 // import React from 'react'
 // import rehypeReact from 'rehype-react'
-// import MainLayout from '@/components/Layouts/MainLayout'
+// import MainLayout from '@components/Layouts/MainLayout'
 
 // const renderAst = new rehypeReact({
 //   createElement: React.createElement
