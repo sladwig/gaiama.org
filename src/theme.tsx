@@ -27,7 +27,7 @@ export const colors = preval`
     creme: '#fafafa',
     lightBlue: '#f3f8fd',
     // lightBlue: '#f1f4f8',
-    link: primaryLite, // axe '#0A616C', // before Lighthouse: '#0e91a0', 
+    link: primaryLite, // axe '#0A616C', // before Lighthouse: '#0e91a0',
     // linkHover: '#0fc1d6',
     linkHover: '#0a474e',
     // link: '#13abaa',
@@ -146,16 +146,27 @@ export const InstagramGradient = props => (
 //   maxXxl: `@media (max-width: 1280px)`,
 //   minXxl: `@media (min-width: 1281px)`,
 // }
-
+enum SIZE {
+  xxsmall = 'xxsmall',
+  xsmall = 'xsmall',
+  small = 'small',
+  medium = 'medium',
+  large = 'large',
+  xlarge = 'xlarge',
+  xxlarge = 'xxlarge',
+  xxxlarge = 'xxxlarge',
+  largerSidebar = 'largerSidebar',
+  sidebarFixed = 'sidebarFixed',
+}
 export const SIZES = {
-  xxsmall: { min: 375, max: 424 },
-  xsmall: { min: 425, max: 768 },
-  small: { min: 769, max: 850 },
-  medium: { min: 851, max: 992 },
-  large: { min: 993, max: 1024 },
-  xlarge: { min: 1025, max: 1200 },
-  xxlarge: { min: 1201, max: 1290 },
-  xxxlarge: { min: 1291, max: Infinity },
+  [SIZE.xxsmall]: { min: 375, max: 424 },
+  [SIZE.xsmall]: { min: 425, max: 768 },
+  [SIZE.small]: { min: 769, max: 850 },
+  [SIZE.medium]: { min: 851, max: 992 },
+  [SIZE.large]: { min: 993, max: 1024 },
+  [SIZE.xlarge]: { min: 1025, max: 1200 },
+  [SIZE.xxlarge]: { min: 1201, max: 1290 },
+  [SIZE.xxxlarge]: { min: 1291, max: Infinity },
   // xsmall: { min: 0, max: 599 },
   // small: { min: 600, max: 779 },
   // medium: { min: 780, max: 979 },
@@ -165,12 +176,12 @@ export const SIZES = {
   // xxxlarge: { min: 1441, max: Infinity },
 
   // Sidebar/nav related tweakpoints
-  largerSidebar: { min: 1100, max: 1339 },
-  sidebarFixed: { min: 2000, max: Infinity },
+  [SIZE.largerSidebar]: { min: 1100, max: 1339 },
+  [SIZE.sidebarFixed]: { min: 2000, max: Infinity },
 }
 
 export const media = {
-  between(smallKey, largeKey, excludeLarge = false) {
+  between(smallKey: SIZE, largeKey: SIZE, excludeLarge = false) {
     if (excludeLarge) {
       return `@media (min-width: ${
         SIZES[smallKey].min
@@ -186,15 +197,15 @@ export const media = {
     }
   },
 
-  greaterThan(key) {
+  greaterThan(key: SIZE) {
     return `@media (min-width: ${SIZES[key].min}px)`
   },
 
-  lessThan(key) {
+  lessThan(key: SIZE) {
     return `@media (max-width: ${SIZES[key].min - 1}px)`
   },
 
-  size(key) {
+  size(key: SIZE) {
     const size = SIZES[key]
 
     if (size.min == null) {
@@ -220,12 +231,12 @@ export const maxWidthContent = {
 
 export const fullPageWidth = {
   position: `relative`,
-  [media.lessThan(`xxxlarge`)]: {
+  [media.lessThan(SIZE.xxxlarge)]: {
     width: `100vw`,
     left: `50%`,
     transform: `translateX(-50vw)`,
   },
-  [media.greaterThan(`xxxlarge`)]: {
+  [media.greaterThan(SIZE.xxxlarge)]: {
     left: `50%`,
     transform: `translateX(-720px)`,
     width: `1440px`,
@@ -311,22 +322,22 @@ export const Box = styled.div(
 /* visibility helper */
 export const visible = {
   maxSm: {
-    [media.greaterThan(`small`)]: {
+    [media.greaterThan(SIZE.small)]: {
       display: `none`,
     },
   },
   maxMd: {
-    [media.greaterThan(`medium`)]: {
+    [media.greaterThan(SIZE.medium)]: {
       display: `none`,
     },
   },
   minSm: {
-    [media.lessThan(`small`)]: {
+    [media.lessThan(SIZE.small)]: {
       display: `none`,
     },
   },
   minMd: {
-    [media.lessThan(`medium`)]: {
+    [media.lessThan(SIZE.medium)]: {
       display: `none`,
     },
   },
