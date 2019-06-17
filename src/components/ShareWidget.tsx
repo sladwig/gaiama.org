@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from '@emotion/styled'
 import { css } from '@emotion/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { colors, media } from '@src/theme'
+import { colors, media, SIZE } from '@src/theme'
 import { faLink, faTimes, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import {
   faFacebookSquare,
@@ -11,10 +11,10 @@ import {
   faGooglePlusSquare,
 } from '@fortawesome/free-brands-svg-icons'
 import { PureButton } from '@components/layout/Button'
-import { toast } from '@src/utils/toast'
+import { toast } from '../utils/toast'
 
 const Container = styled.div({
-  [media.greaterThan(`xsmall`)]: {
+  [media.greaterThan(SIZE.xsmall)]: {
     display: `flex`,
     alignItems: `center`,
     flexDirection: `column`,
@@ -29,7 +29,7 @@ const Title = styled.h4({
   fontSize: `1.5rem`,
   margin: 0,
   marginRight: `2rem`,
-  [media.lessThan(`xsmall`)]: { marginBottom: `1rem` },
+  [media.lessThan(SIZE.xsmall)]: { marginBottom: `1rem` },
 })
 
 const Button = styled(PureButton)`
@@ -94,7 +94,8 @@ const Checkbox = styled.input`
  * https://gist.github.com/MoOx/12726d85a3343d84ee3c
  * https://stackoverflow.com/questions/49187412/handle-react-ondoubleclick-and-single-onclick-for-same-element
  */
-function ShareWidget({  label,
+function ShareWidget({
+  label,
   getFullUrlLabel,
   copyLabel,
   linkLabelShort,
@@ -103,27 +104,25 @@ function ShareWidget({  label,
   shareUrlErrorLabel,
   post,
   siteUrl,
-}: ShareWidgetProps)  {
-  const [linkModalOpen, setLinkModalOpen] = useState(false);
-  const [showFullUrl, setShowFullUrl] = useState(false);
+}: ShareWidgetProps) {
+  const [linkModalOpen, setLinkModalOpen] = useState(false)
+  const [showFullUrl, setShowFullUrl] = useState(false)
 
   const linkInputRef = useRef<HTMLInputElement>()
 
   const getLink = () =>
-    siteUrl +
-    (this.state.showFullUrl
-      ? post.fields.url
-      : post.fields.slug_short)
+    siteUrl + (showFullUrl ? post.fields.url : post.fields.slug_short)
 
-  const onLinkModalButtonClick = ({ metaKey }) =>
-    metaKey ? this.copyToClipboard() : this.toggleLinkModal()
+  const onLinkModalButtonClick = ({ metaKey }: { metaKey: boolean }) =>
+    metaKey ? copyToClipboard() : toggleLinkModal()
 
   const toggleLinkModal = () => setLinkModalOpen(!linkModalOpen)
 
   const toggleLink = () => setShowFullUrl(!showFullUrl)
 
-  const onClickLinkInput = () => linkInputRef.current.select()
-
+  const onClickLinkInput = () => {
+    if (linkInputRef.current) linkInputRef.current.select()
+  }
   const copyToClipboard = () => {
     /* globals document */
     // let shareUrlInput = document.getElementById(`share-url`)
@@ -132,7 +131,7 @@ function ShareWidget({  label,
     try {
       if (!shareUrlInput) {
         shareUrlInput = document.createElement(`textarea`)
-        shareUrlInput.value = this.getLink()
+        shareUrlInput.value = getLink()
         document.getElementById(`sharewidget`).appendChild(shareUrlInput)
         inputShouldBeRemoved = true
       }
@@ -156,166 +155,165 @@ function ShareWidget({  label,
   const link = siteUrl + post.fields.url
   const shortLink = siteUrl + post.fields.slug_short
 
-    return (
-      <Container id="sharewidget" {...props}>
-        {label && <Title>{label}</Title>}
+  return (
+    <Container id="sharewidget" {...props}>
+      {label && <Title>{label}</Title>}
 
-        <ContainerInner>
-          <div
-            css={css`
-              & svg {
-                color: ${colors.brands.facebook};
-                margin-right: 1rem;
-              }
-            `}
+      <ContainerInner>
+        <div
+          css={css`
+            & svg {
+              color: ${colors.brands.facebook};
+              margin-right: 1rem;
+            }
+          `}
+        >
+          <StyledA
+            href={`http://www.facebook.com/sharer.php?u=${encodeURIComponent(
+              link
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Share via Facebook"
           >
-            <StyledA
-              href={`http://www.facebook.com/sharer.php?u=${encodeURIComponent(
-                link
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Share via Facebook"
-            >
-              <FontAwesomeIcon icon={faFacebookSquare} size="lg" />
-            </StyledA>
-          </div>
-          <div
-            css={css`
-              & svg {
-                color: ${colors.brands.twitter};
-                margin: 0 1rem;
-              }
-            `}
+            <FontAwesomeIcon icon={faFacebookSquare} size="lg" />
+          </StyledA>
+        </div>
+        <div
+          css={css`
+            & svg {
+              color: ${colors.brands.twitter};
+              margin: 0 1rem;
+            }
+          `}
+        >
+          <StyledA
+            href={
+              tweet_id
+                ? `https://twitter.com/intent/retweet?tweet_id=${encodeURIComponent(
+                    tweet_id
+                  )}`
+                : `http://twitter.com/share?text=${encodeURIComponent(
+                    title
+                  )}&url=${encodeURIComponent(shortLink)}`
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Share via Twitter"
           >
-            <StyledA
-              href={
-                tweet_id
-                  ? `https://twitter.com/intent/retweet?tweet_id=${encodeURIComponent(
-                      tweet_id
-                    )}`
-                  : `http://twitter.com/share?text=${encodeURIComponent(
-                      title
-                    )}&url=${encodeURIComponent(shortLink)}`
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Share via Twitter"
-            >
-              <FontAwesomeIcon icon={faTwitterSquare} size="lg" />
-            </StyledA>
-          </div>
-          <div
-            css={css`
-              & svg {
-                color: ${colors.brands.gplus};
-                margin: 0 1rem;
-              }
-            `}
+            <FontAwesomeIcon icon={faTwitterSquare} size="lg" />
+          </StyledA>
+        </div>
+        <div
+          css={css`
+            & svg {
+              color: ${colors.brands.gplus};
+              margin: 0 1rem;
+            }
+          `}
+        >
+          <StyledA
+            href={`https://plus.google.com/share?url=${encodeURIComponent(
+              link
+            )}&hl=${encodeURIComponent(lang)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Share via Google+"
           >
-            <StyledA
-              href={`https://plus.google.com/share?url=${encodeURIComponent(
-                link
-              )}&hl=${encodeURIComponent(lang)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Share via Google+"
-            >
-              <FontAwesomeIcon icon={faGooglePlusSquare} size="lg" />
-            </StyledA>
-          </div>
-          <div
-            css={css`
-              & svg {
-                color: ${colors.primaryLite};
-                margin: 1rem;
-              }
-            `}
+            <FontAwesomeIcon icon={faGooglePlusSquare} size="lg" />
+          </StyledA>
+        </div>
+        <div
+          css={css`
+            & svg {
+              color: ${colors.primaryLite};
+              margin: 1rem;
+            }
+          `}
+        >
+          <StyledA
+            href={`mailto:?body=${encodeURIComponent(
+              link
+            )}&subject=${encodeURIComponent(title)}`}
+            rel="noopener noreferrer"
+            title="Share via Mail"
           >
-            <StyledA
-              href={`mailto:?body=${encodeURIComponent(
-                link
-              )}&subject=${encodeURIComponent(title)}`}
-              rel="noopener noreferrer"
-              title="Share via Mail"
-            >
-              <FontAwesomeIcon icon={faEnvelope} size="lg" />
-            </StyledA>
-          </div>
+            <FontAwesomeIcon icon={faEnvelope} size="lg" />
+          </StyledA>
+        </div>
 
-          <div
-            css={css`
-              & svg {
-                color: ${colors.link};
-              }
-            `}
+        <div
+          css={css`
+            & svg {
+              color: ${colors.link};
+            }
+          `}
+        >
+          <Button
+            aria-label="Copy Link"
+            onClick={onLinkModalButtonClick}
+            onDoubleClick={copyToClipboard}
           >
-            <Button
-              aria-label="Copy Link"
-              onClick={this.onLinkModalButtonClick}
-              onDoubleClick={this.copyToClipboard}
-            >
-              <FontAwesomeIcon icon={faLink} size="lg" />
-            </Button>
-          </div>
-        </ContainerInner>
+            <FontAwesomeIcon icon={faLink} size="lg" />
+          </Button>
+        </div>
+      </ContainerInner>
 
-        {linkModalOpen && (
-          <LinkModal>
-            <LinkModalHeader>
-              <Label>
-                <Checkbox type="checkbox" onClick={this.toggleLink} />
-                <span>{getFullUrlLabel}</span>
-              </Label>
-              <FontAwesomeIcon
-                icon={faTimes}
-                onClick={this.toggleLinkModal}
-                css={css`
-                  color: ${colors.gray3};
-                `}
-              />
-            </LinkModalHeader>
-            <LinkWrapper>
-              <LinkLabel onClick={this.onClickLinkInput}>
-                {showFullUrl ? linkLabelFull : linkLabelShort}
-              </LinkLabel>
-              <InvisibleInput
-                id="share-url"
-                type="text"
-                value={showFullUrl ? link : shortLink}
-                readOnly
-                onClick={this.onClickLinkInput}
-                innerRef={linkInputRef}
-              />
-              <Button onClick={this.copyToClipboard}>{copyLabel}</Button>
-            </LinkWrapper>
-          </LinkModal>
-        )}
-      </Container>
-    )
-  }
+      {linkModalOpen && (
+        <LinkModal>
+          <LinkModalHeader>
+            <Label>
+              <Checkbox type="checkbox" onClick={toggleLink} />
+              <span>{getFullUrlLabel}</span>
+            </Label>
+            <FontAwesomeIcon
+              icon={faTimes}
+              onClick={toggleLinkModal}
+              css={css`
+                color: ${colors.gray3};
+              `}
+            />
+          </LinkModalHeader>
+          <LinkWrapper>
+            <LinkLabel onClick={onClickLinkInput}>
+              {showFullUrl ? linkLabelFull : linkLabelShort}
+            </LinkLabel>
+            <InvisibleInput
+              id="share-url"
+              type="text"
+              value={showFullUrl ? link : shortLink}
+              readOnly
+              onClick={onClickLinkInput}
+              innerRef={linkInputRef}
+            />
+            <Button onClick={copyToClipboard}>{copyLabel}</Button>
+          </LinkWrapper>
+        </LinkModal>
+      )}
+    </Container>
+  )
 }
 
-interface ShareWidgetProps  {
-  label: string,
-  getFullUrlLabel: string,
-  copyLabel: string,
-  linkLabelShort: string,
-  linkLabelFull: string,
-  shareUrlSuccessLabel: string,
-  shareUrlErrorLabel: string,
+interface ShareWidgetProps {
+  label: string
+  getFullUrlLabel: string
+  copyLabel: string
+  linkLabelShort: string
+  linkLabelFull: string
+  shareUrlSuccessLabel: string
+  shareUrlErrorLabel: string
   post: {
-      frontmatter: {
-           title: string,
-           tweet_id: string,
-           lang: string
-      },
-      fields: {
-          url: string,
-          slug_short: string
-      }
-  },
-  siteUrl: string,
+    frontmatter: {
+      title: string
+      tweet_id: string
+      lang: string
+    }
+    fields: {
+      url: string
+      slug_short: string
+    }
+  }
+  siteUrl: string
 }
 
 export default ShareWidget

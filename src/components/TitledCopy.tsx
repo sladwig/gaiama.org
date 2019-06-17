@@ -1,36 +1,49 @@
-import React, { FunctionComponent } from 'react'
-import PropTypes from 'prop-types'
+import React, { SFC, useState, ComponentType } from 'react'
+// import PropTypes from 'prop-types'
 import styled from '@emotion/styled'
 import slugify from 'slugify'
-import { media } from '@src/theme'
+import { media, SIZE } from '@src/theme'
 import StateProvider from '@components/StateProvider'
-import Button from '@components/layout/Button'
+import Button from '@root/src/components/layout/Button'
 
-const Container = styled.div(props => ({
-  marginRight: `auto`,
-  marginLeft: `auto`,
-  textAlign: props.centered && `center`,
-  [media.greaterThan(`medium`)]: {
-    width: !props.full && [
-      // `753px`,
-      // `80ch`,
-      `81%`,
-    ],
-  },
+interface ContainerProp {
+  centered?: boolean
+  full?: boolean
+}
+
+const Container = styled.div<ContainerProp>(
+  ({ centered = false, full = false }) => ({
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    textAlign: centered ? 'center' : 'left',
+    [media.greaterThan(SIZE.medium)]: {
+      width: full ? '100%' : '81%',
+    },
+  })
+)
+
+interface TitleProp {
+  centeredTitle?: boolean
+}
+const Title = styled.h2<TitleProp>(({ centeredTitle = false }: TitleProp) => ({
+  textAlign: centeredTitle ? 'center' : 'left',
 }))
 
-const Title = styled.h2(props => ({
-  textAlign: props.centeredTitle && `center`,
-}))
+interface ContentWrapperProps {
+  centeredCopy?: boolean
+  spoiler?: boolean
+  spoilerOpen?: boolean
+}
+const ContentWrapper = styled.div<ContentWrapperProps>(
+  ({ centeredCopy = false, spoiler = false, spoilerOpen = false }) => ({
+    textAlign: centeredCopy ? 'center' : 'left',
+    overflow: 'hidden',
+    transition: `max-height .3s`,
+    maxHeight: spoiler && spoilerOpen ? `100%` : `100px`,
+  })
+)
 
-const ContentWrapper = styled.div(props => ({
-  textAlign: props.centeredCopy && `center`,
-  overflow: `hidden`,
-  transition: `max-height .3s`,
-  maxHeight: props.spoiler && (props.spoilerOpen ? `100%` : `100px`),
-}))
-
-const TitledCopy: FunctionComponent<TitledCopyProps> = ({
+const TitledCopy: SFC<TitledCopyProps> = ({
   title,
   rank,
   paragraphs,
@@ -45,18 +58,19 @@ const TitledCopy: FunctionComponent<TitledCopyProps> = ({
   children,
   ...props
 }) => {
+  const [spoilerOpen, setSpoilerOpen] = useState(
+    state ? state.spoilerOpen : false
+  )
   const content = children || paragraphs
   const slugifiedId =
     title &&
     slugify(Array.isArray(title) ? title.join(` `) : title, {
       remove: /[$*_+~.()'"!\-:@?&]/g,
     })
-  const handleClick = () =>
-    setState({
-      spoilerOpen: !state.spoilerOpen,
-    })
+  const handleClick = () => setSpoilerOpen(!spoilerOpen)
 
-  const Tag = Title.withComponent(rank ? (rank > 6 ? `h6` : `h${rank}`) : `h2`)
+  const rankComponent = rank ? (rank > 6 ? `h6` : `h${rank}`) : `h2`
+  const Tag = Title.withComponent((rankComponent as unknown) as ComponentType)
 
   return (
     <Container centered={centered} full={full} {...props}>
@@ -71,19 +85,15 @@ const TitledCopy: FunctionComponent<TitledCopyProps> = ({
       {content && (
         <ContentWrapper
           spoiler={spoiler}
-          spoilerOpen={state.spoilerOpen}
+          spoilerOpen={spoilerOpen}
           centeredCopy={centeredCopy}
         >
-          {Array.isArray(content) ? (
-            content.map((x, i) => (
-              <div key={i} dangerouslySetInnerHTML={{ __html: x }} />
-            ))
-          ) : (
-            <div dangerouslySetInnerHTML={{ __html: content }} />
-          )}
+          {Array(content).map((x, i) => (
+            <div key={i} dangerouslySetInnerHTML={{ __html: x as string }} />
+          ))}
         </ContentWrapper>
       )}
-      {spoiler && !state.spoilerOpen && (
+      {spoiler && !spoilerOpen && (
         <Button onClick={handleClick}>{spoilerLabel}</Button>
       )}
     </Container>

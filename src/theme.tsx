@@ -113,7 +113,7 @@ export const focusOutlineNone = {
 
 // svg gradient from https://stackoverflow.com/a/47801536/3484824
 // hide svg definitions from https://stackoverflow.com/a/24820654/3484824
-export const InstagramGradient = props => (
+export const InstagramGradient = () => (
   <div
     css={css`
       height: 0;
@@ -146,7 +146,7 @@ export const InstagramGradient = props => (
 //   maxXxl: `@media (max-width: 1280px)`,
 //   minXxl: `@media (min-width: 1281px)`,
 // }
-enum SIZE {
+export enum SIZE {
   xxsmall = 'xxsmall',
   xsmall = 'xsmall',
   small = 'small',
