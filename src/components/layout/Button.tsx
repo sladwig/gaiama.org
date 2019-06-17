@@ -1,5 +1,5 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { SFC } from 'react'
+// import PropTypes from 'prop-types'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { colors } from '@src/theme'
@@ -8,7 +8,12 @@ import { colors } from '@src/theme'
  * hiding outline for pointing devices based on
  * http://kizu.ru/en/blog/keyboard-only-focus/#proper-solution
  */
-const PureButton = ({ children, onClick, styles, ...props }) => (
+const PureButton: SFC<PureButtonProp> = ({
+  children,
+  onClick,
+  styles,
+  ...props
+}) => (
   <button
     tabIndex={0}
     onClick={onClick}
@@ -38,13 +43,9 @@ const PureButton = ({ children, onClick, styles, ...props }) => (
     </span>
   </button>
 )
-PureButton.propTypes = {
-  onClick: PropTypes.func,
-  styles: PropTypes.object,
-}
-PureButton.defaultProps = {
-  onClick() {},
-  styles: {},
+interface PureButtonProp {
+  onClick?: () => any
+  styles?: string
 }
 
 const Button = styled(PureButton)()
